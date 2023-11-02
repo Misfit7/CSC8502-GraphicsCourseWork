@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+    </Filter>
+    <Filter Include="Resource Files\Textures">
+    </Filter>
+    <Filter Include="Resource Files\Meshes">
+    </Filter>
+    <Filter Include="Resource Files\Shaders">
+    </Filter>
+    <Filter Include="Resource Files\Textures\RealisticCharacter">
+    </Filter>
+    <Filter Include="Resource Files\Textures\RealisticCharacter\Weapon">
+    </Filter>
+    <Filter Include="Resource Files\Textures\RealisticCharacter\Role">
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Meshes\Capsule.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Capsule.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Cone.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Cone.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Cube.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Cube.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Cylinder.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Cylinder.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\OffsetCube.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\OffsetCube.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\OffsetCubeY.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\OffsetCubeY.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\OffsetCubeZ.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\OffsetCubeZ.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Role_T.anm">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Role_T.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Role_T.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Sphere.mat">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Meshes\Sphere.msh">
+      <Filter>Resource Files\Meshes</Filter>
+    </None>
+    <None Include="..\Shaders\basicVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\bufferFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\BumpFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\BumpVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\colourFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\combinefrag.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\combinevert.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\MatrixVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\PerPixelFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\PerPixelVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\pointlightfrag.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\pointlightvert.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\processfrag.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\reflectFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\reflectVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\SceneFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\SceneVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\shadowFrag.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\shadowscenefrag.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\shadowscenevert.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\shadowVert.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\SkinningVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\skyboxFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\skyboxVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\StencilFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\TexturedFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\TexturedVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\zxFragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\zxVertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Textures\Barren Reds.JPG">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\Barren RedsDOT3.JPG">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\brick.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\brickDOT3.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\noise.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\particle.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\reticle.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\rusted down.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\rusted east.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\rusted north.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\rusted south.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\rusted up.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\rusted west.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\stainedglass.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\star.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\stubdot3.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\tahoma.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\water.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\waterbump.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Textures\RealisticCharacter\role\Body.tga">
+      <Filter>Resource Files\Textures\RealisticCharacter\Role</Filter>
+    </Image>
+    <Image Include="..\Textures\RealisticCharacter\role\Hair.tga">
+      <Filter>Resource Files\Textures\RealisticCharacter\Role</Filter>
+    </Image>
+    <Image Include="..\Textures\RealisticCharacter\role\head.tga">
+      <Filter>Resource Files\Textures\RealisticCharacter\Role</Filter>
+    </Image>
+    <Image Include="..\Textures\RealisticCharacter\weapon\Weapon.tga">
+      <Filter>Resource Files\Textures\RealisticCharacter\Weapon</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
