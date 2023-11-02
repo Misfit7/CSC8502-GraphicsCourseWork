@@ -138,9 +138,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Renderer13.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Renderer13.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Meshes\Capsule.mat" />
