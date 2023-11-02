@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8274D442-89CD-4AC2-AA8E-A9FA621452ED}</ProjectGuid>
+    <ProjectGuid>{5E5378FE-275C-4B32-935D-22E7A4AD5AA3}</ProjectGuid>
     <RootNamespace>Tutorial1</RootNamespace>
-    <ProjectName>GraphicsCourseWork</ProjectName>
+    <ProjectName>Tutorial 14 - Shadow Mapping</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -87,21 +87,20 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>nclgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>nclgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -116,8 +115,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>nclgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,91 +128,28 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>nclgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="tutorial14.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Meshes\Capsule.mat" />
-    <None Include="..\Meshes\Capsule.msh" />
-    <None Include="..\Meshes\Cone.mat" />
-    <None Include="..\Meshes\Cone.msh" />
-    <None Include="..\Meshes\Cube.mat" />
-    <None Include="..\Meshes\Cube.msh" />
-    <None Include="..\Meshes\Cylinder.mat" />
-    <None Include="..\Meshes\Cylinder.msh" />
-    <None Include="..\Meshes\OffsetCube.mat" />
-    <None Include="..\Meshes\OffsetCube.msh" />
-    <None Include="..\Meshes\OffsetCubeY.mat" />
-    <None Include="..\Meshes\OffsetCubeY.msh" />
-    <None Include="..\Meshes\OffsetCubeZ.mat" />
-    <None Include="..\Meshes\OffsetCubeZ.msh" />
-    <None Include="..\Meshes\Role_T.anm" />
-    <None Include="..\Meshes\Role_T.mat" />
-    <None Include="..\Meshes\Role_T.msh" />
-    <None Include="..\Meshes\Sphere.mat" />
-    <None Include="..\Meshes\Sphere.msh" />
-    <None Include="..\Shaders\basicVertex.glsl" />
-    <None Include="..\Shaders\bufferFragment.glsl" />
-    <None Include="..\Shaders\BumpFragment.glsl" />
-    <None Include="..\Shaders\BumpVertex.glsl" />
-    <None Include="..\Shaders\colourFragment.glsl" />
-    <None Include="..\Shaders\combinefrag.glsl" />
-    <None Include="..\Shaders\combinevert.glsl" />
-    <None Include="..\Shaders\MatrixVertex.glsl" />
-    <None Include="..\Shaders\PerPixelFragment.glsl" />
-    <None Include="..\Shaders\PerPixelVertex.glsl" />
-    <None Include="..\Shaders\pointlightfrag.glsl" />
-    <None Include="..\Shaders\pointlightvert.glsl" />
-    <None Include="..\Shaders\processfrag.glsl" />
-    <None Include="..\Shaders\reflectFragment.glsl" />
-    <None Include="..\Shaders\reflectVertex.glsl" />
-    <None Include="..\Shaders\SceneFragment.glsl" />
-    <None Include="..\Shaders\SceneVertex.glsl" />
     <None Include="..\Shaders\shadowFrag.glsl" />
     <None Include="..\Shaders\shadowscenefrag.glsl" />
     <None Include="..\Shaders\shadowscenevert.glsl" />
     <None Include="..\Shaders\shadowVert.glsl" />
-    <None Include="..\Shaders\SkinningVertex.glsl" />
-    <None Include="..\Shaders\skyboxFragment.glsl" />
-    <None Include="..\Shaders\skyboxVertex.glsl" />
-    <None Include="..\Shaders\StencilFragment.glsl" />
-    <None Include="..\Shaders\TexturedFragment.glsl" />
-    <None Include="..\Shaders\TexturedVertex.glsl" />
-    <None Include="..\Shaders\zxFragment.glsl" />
-    <None Include="..\Shaders\zxVertex.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\Textures\Barren Reds.JPG" />
-    <Image Include="..\Textures\Barren RedsDOT3.JPG" />
-    <Image Include="..\Textures\brick.tga" />
-    <Image Include="..\Textures\brickDOT3.tga" />
-    <Image Include="..\Textures\noise.png" />
-    <Image Include="..\Textures\particle.tga" />
-    <Image Include="..\Textures\RealisticCharacter\role\Body.tga" />
-    <Image Include="..\Textures\RealisticCharacter\role\Hair.tga" />
-    <Image Include="..\Textures\RealisticCharacter\role\head.tga" />
-    <Image Include="..\Textures\RealisticCharacter\weapon\Weapon.tga" />
-    <Image Include="..\Textures\reticle.tga" />
-    <Image Include="..\Textures\rusted down.jpg" />
-    <Image Include="..\Textures\rusted east.jpg" />
-    <Image Include="..\Textures\rusted north.jpg" />
-    <Image Include="..\Textures\rusted south.jpg" />
-    <Image Include="..\Textures\rusted up.jpg" />
-    <Image Include="..\Textures\rusted west.jpg" />
-    <Image Include="..\Textures\stainedglass.tga" />
-    <Image Include="..\Textures\star.png" />
-    <Image Include="..\Textures\stubdot3.tga" />
-    <Image Include="..\Textures\tahoma.tga" />
-    <Image Include="..\Textures\water.tga" />
-    <Image Include="..\Textures\waterbump.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Tutorial6.cpp" />
+    <ClCompile Include="CubeRobot.h" />
+    <ClCompile Include="CubeRobot.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Renderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shaders\SceneFragment.glsl" />
+    <None Include="..\Shaders\SceneVertex.glsl" />
+  </ItemGroup>
+</Project>

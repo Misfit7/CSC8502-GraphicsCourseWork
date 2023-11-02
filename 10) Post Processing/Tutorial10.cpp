@@ -1,9 +1,8 @@
-#include "../NCLGL/window.h"
+#include "../nclgl/window.h"
 #include "Renderer.h"
 
 int main() {
-    Window w("Starshield", 1280, 720, false);
-
+    Window w("Post Processing!", 1280, 720, false);
     if (!w.HasInitialised()) {
         return -1;
     }
@@ -13,6 +12,9 @@ int main() {
         return -1;
     }
 
+    w.LockMouseToWindow(true);
+    w.ShowOSPointer(false);
+
     while (w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
         renderer.UpdateScene(w.GetTimer()->GetTimeDeltaSeconds());
         renderer.RenderScene();
@@ -21,5 +23,6 @@ int main() {
             Shader::ReloadAllShaders();
         }
     }
+
     return 0;
 }
