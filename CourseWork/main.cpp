@@ -1,5 +1,5 @@
 #include "../NCLGL/window.h"
-#include "Renderer.h"
+#include "URenderer.h"
 
 int main() {
     Window w("Starfiled", 1280, 720, false);
@@ -7,8 +7,8 @@ int main() {
         return -1;
     }
 
-    Renderer renderer(w);
-    if (!renderer.HasInitialised()) {
+    URenderer Urenderer(w);
+    if (!Urenderer.HasInitialised()) {
         return -1;
     }
 
@@ -16,9 +16,11 @@ int main() {
     w.ShowOSPointer(false);
 
     while (w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
-        renderer.UpdateScene(w.GetTimer()->GetTimeDeltaSeconds());
-        renderer.RenderScene();
-        renderer.SwapBuffers();
+        Urenderer.UpdateScene(w.GetTimer()->GetTimeDeltaSeconds());
+        Urenderer.RenderScene();
+        Urenderer.SwapBuffers();
+
+        //Urenderer.AutoScene();
 
         if (Window::GetKeyboard()->KeyDown(KEYBOARD_F5)) {
             Shader::ReloadAllShaders();

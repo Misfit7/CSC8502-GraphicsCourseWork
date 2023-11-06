@@ -8,12 +8,14 @@
 
 #include "SolarSystem.h"
 
-class Renderer : public OGLRenderer {
+class URenderer : public OGLRenderer {
 public:
-    Renderer(Window& parent);
-    ~Renderer(void);
+    URenderer(Window& parent);
+    ~URenderer(void);
     void RenderScene() override;
     void UpdateScene(float dt) override;
+
+    void AutoScene();
 
 protected:
     //draw
@@ -33,6 +35,7 @@ protected:
 
     //solar system eight star
     SceneNode* root;
+    SolarSystem* solar;
 
     //build sort draw nodelist
     vector <SceneNode*> transparentNodeList;

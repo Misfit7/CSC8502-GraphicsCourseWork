@@ -138,11 +138,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SolarSystem.cpp" />
-    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="URenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SolarSystem.h" />
-    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="URenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Meshes\Capsule.mat" />

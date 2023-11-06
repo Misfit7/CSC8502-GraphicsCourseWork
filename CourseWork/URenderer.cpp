@@ -1,15 +1,17 @@
-#include "Renderer.h"
+#include "URenderer.h"
 
 #include <algorithm>
 
-Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
-    camera = new Camera(-45.0f, 0.0f, (Vector3(1000.0f, 1000.0f, 1000.0f)));
+URenderer::URenderer(Window& parent) : OGLRenderer(parent) {
+    camera = new Camera(-45.0f, 0.0f, (Vector3(2200.0f, 1000.0f, 1000.0f)));
+    light = new Light(Vector3(0.0f, 0.0f, 0.0f), Vector4(1, 1, 1, 1), 1000.0f);
     quad = Mesh::GenerateQuad();
 
     //shader
     skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
     sceneShader = new Shader("SceneVertex.glsl", "SceneFragment.glsl");
-    if (!sceneShader->LoadSuccess() || !skyboxShader->LoadSuccess()) {
+    shadowShader = new Shader("shadowVert.glsl", "shadowFrag.glsl");
+    if (!sceneShader->LoadSuccess() || !skyboxShader->LoadSuccess() || !shadowShader->LoadSuccess()) {
         return;
     }
 
@@ -20,18 +22,19 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 
     //planet
     root = new SceneNode();
-    SceneNode* s = new SolarSystem();
-    root->AddChild(s);
+    solar = new SolarSystem();
+    root->AddChild(solar);
 
+    //glFuntion
     projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //transparent
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     init = true;
 }
 
-Renderer ::~Renderer(void) {
+URenderer ::~URenderer(void) {
     delete root;
     delete quad;
     delete camera;
@@ -40,14 +43,22 @@ Renderer ::~Renderer(void) {
     glDeleteTextures(1, &texture);
 }
 
-void Renderer::UpdateScene(float dt) {
+void URenderer::AutoScene() {
+    Vector3 earthPosition = solar->getEarthPosiotion();
+    earthPosition.y += 1000.0f;
+    camera->SetPosition(earthPosition);
+    camera->SetYaw(-90.0f);
+}
+
+void URenderer::UpdateScene(float dt) {
     camera->UpdateCamera(10 * dt);
+
     viewMatrix = camera->BuildViewMatrix();
     frameFrustum.FromMatrix(projMatrix * viewMatrix);
     root->Update(dt);
 }
 
-void Renderer::BuildNodeLists(SceneNode* from) {
+void URenderer::BuildNodeLists(SceneNode* from) {
     if (frameFrustum.InsideFrustum(*from)) {
         Vector3 dir = from->GetWorldTransform().GetPositionVector() - camera->GetPosition();
         from->SetCameraDistance(Vector3::Dot(dir, dir));
@@ -63,12 +74,12 @@ void Renderer::BuildNodeLists(SceneNode* from) {
     }
 }
 
-void Renderer::SortNodeLists() {
+void URenderer::SortNodeLists() {
     std::sort(transparentNodeList.rbegin(), transparentNodeList.rend(), SceneNode::CompareByCameraDistance);
     std::sort(nodeList.begin(), nodeList.end(), SceneNode::CompareByCameraDistance);
 }
 
-void Renderer::DrawNodes() {
+void URenderer::DrawNodes() {
     for (const auto& i : nodeList) {
         DrawNode(i);
     }
@@ -77,7 +88,7 @@ void Renderer::DrawNodes() {
     }
 }
 
-void Renderer::DrawNode(SceneNode* n) {
+void URenderer::DrawNode(SceneNode* n) {
     if (n->GetMesh()) {
         Matrix4 model = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
         glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
@@ -91,7 +102,7 @@ void Renderer::DrawNode(SceneNode* n) {
     }
 }
 
-void Renderer::DrawSkybox() {
+void URenderer::DrawSkybox() {
     glDepthMask(GL_FALSE);
 
     BindShader(skyboxShader);
@@ -102,7 +113,7 @@ void Renderer::DrawSkybox() {
     glDepthMask(GL_TRUE);
 }
 
-void Renderer::DrawMainScene() {
+void URenderer::DrawMainScene() {
     BuildNodeLists(root);
     SortNodeLists();
     BindShader(sceneShader);
@@ -113,13 +124,19 @@ void Renderer::DrawMainScene() {
 
 }
 
-void Renderer::RenderScene() {
+void URenderer::DrawShadowScene()
+{
+
+}
+
+void URenderer::RenderScene() {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     DrawSkybox();
     DrawMainScene();
+    DrawShadowScene();
 }
 
-void Renderer::ClearNodeLists() {
+void URenderer::ClearNodeLists() {
     transparentNodeList.clear();
     nodeList.clear();
 }

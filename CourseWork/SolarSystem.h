@@ -10,6 +10,7 @@ public:
     SolarSystem();
     ~SolarSystem(void) {};
     void Update(float dt) override;
+    Vector3 getEarthPosiotion() { return earth->GetWorldTransform().GetPositionVector(); };
 
 protected:
     Mesh* m;
