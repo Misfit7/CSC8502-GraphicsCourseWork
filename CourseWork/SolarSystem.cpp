@@ -25,18 +25,18 @@ SolarSystem::SolarSystem()
     mercury->SetModelScale(Vector3(24.4f, 24.4f, 24.4f));
     mercury->SetMesh(m);
     mercury->SetTexture(texture);
-    mercury->SetBoundingRadius(2.4f);
+    mercury->SetBoundingRadius(24.4f);
     AddChild(mercury);
 
     //gold
     gold = new SceneNode();
-    texture = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/1.mercury.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+    texture = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/2.gold.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
     gold->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    gold->SetTransform(Matrix4::Translation(Vector3(1000.0f, 0.0f, 0.0f)));
-    gold->SetModelScale(Vector3(24.4f, 24.4f, 24.4f));
+    gold->SetTransform(Matrix4::Translation(Vector3(1400.0f, 0.0f, 0.0f)));
+    gold->SetModelScale(Vector3(60.5f, 60.5f, 60.5f));
     gold->SetMesh(m);
     gold->SetTexture(texture);
-    gold->SetBoundingRadius(2.4f);
+    gold->SetBoundingRadius(60.5f);
     AddChild(gold);
 
     ////earth
@@ -64,10 +64,13 @@ SolarSystem::SolarSystem()
 
 void SolarSystem::Update(float dt)
 {
+    //solar system self_rotation
     transform = transform * Matrix4::Rotation(60.0f * dt, Vector3(0, 1, 0));
-
+    //planet rotation
     sun->SetTransform(sun->GetTransform() * Matrix4::Rotation(-0.0f * dt, Vector3(0, 1, 0)));
-    mercury->SetTransform(mercury->GetTransform() * Matrix4::Rotation(-40.0f * dt, Vector3(0, 1, 0)));
+    mercury->SetTransform(mercury->GetTransform() * Matrix4::Rotation(-0.0f * dt, Vector3(0, 1, 0)));
+    gold->SetTransform(gold->GetTransform() * Matrix4::Rotation(-0.0f * dt, Vector3(0, 1, 0)));
+
     //earthCloud->SetTransform(sun->GetTransform() * Matrix4::Rotation(-40.0f * dt, Vector3(0, 1, 0)));
 
     SceneNode::Update(dt);
