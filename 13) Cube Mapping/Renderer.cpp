@@ -13,7 +13,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 
     cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
         TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
-        TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+        TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0);
 
     if (!earthTex || !earthBump || !cubeMap || !waterTex) {
         return;
@@ -33,7 +33,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 
     Vector3 heightmapSize = heightMap->GetHeightmapSize();
 
-    camera = new Camera(-45.0f, 0.0f, heightmapSize * Vector3(0.5f, 5.0f, 0.5f));
+    camera = new Camera(-45.0f, 0.0f, heightmapSize * Vector3(0.5f, 2.5f, 0.5f));
     light = new Light(heightmapSize * Vector3(0.5f, 1.5f, 0.5f), Vector4(1, 1, 1, 1), heightmapSize.x);
 
     projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)width / (float)height, 45.0f);

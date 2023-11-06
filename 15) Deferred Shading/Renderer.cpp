@@ -16,12 +16,13 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 
     Vector3 heightmapSize = heightMap->GetHeightmapSize();
 
-    camera = new Camera(-45.0f, 0.0f, heightmapSize * Vector3(0.5f, 5.0f, 0.5f));
+    camera = new Camera(-45.0f, 0.0f, heightmapSize * Vector3(0.5f, 2.5f, 0.5f));
 
     pointLights = new Light[LIGHT_NUM];
 
     for (int i = 0; i < LIGHT_NUM; ++i) {
         Light& l = pointLights[i];
+        //light position by random
         l.SetPosition(Vector3(rand() % (int)heightmapSize.x, 150.0f, rand() % (int)heightmapSize.z));
 
         l.SetColour(Vector4(0.5f + (float)(rand() / (float)RAND_MAX),

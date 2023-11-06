@@ -11,4 +11,6 @@ protected:
     SceneNode* head;
     SceneNode* leftArm;
     SceneNode* rightArm;
+    SceneNode* leftLeg;
+    SceneNode* rightLeg;
 };
