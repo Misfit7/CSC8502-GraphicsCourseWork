@@ -1,0 +1,13 @@
+# Blender 3.6.2 MTL File: 'None'
+# www.blender.org
+
+newmtl MI_Archetype_002
+Ns 319.999939
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd -o 0 -1 0 textures/T_Archetype_002_C_AO.jpg
+map_Bump -o 0 -1 0 -bm 1.000000 textures/T_Archetype_002_N.jpg

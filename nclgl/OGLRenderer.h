@@ -59,6 +59,8 @@ public:
 
     bool			HasInitialised() const;
 
+    virtual void AutoScene() {};
+
 protected:
     void SetShaderLight(const Light& l);
 

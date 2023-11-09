@@ -26,12 +26,16 @@ protected:
     Mesh* quad;
     GLuint cubeMap;
     GLuint texture;
+    GLuint shadowTex;
 
     //light and skybox
     Shader* lightShader;
     Shader* skyboxShader;
     Shader* sceneShader;
     Shader* shadowShader;
+
+    //spaceship
+    SceneNode* spaceship;
 
     //solar system eight star
     SceneNode* root;

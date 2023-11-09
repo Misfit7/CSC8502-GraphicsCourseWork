@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include<nclgl/OBJMesh.h>
 
 #define SHADOWSIZE 2048
 
@@ -31,18 +32,20 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
     sceneMeshes.emplace_back(Mesh::GenerateQuad());
     sceneMeshes.emplace_back(Mesh::LoadFromMeshFile("Sphere.msh"));
     sceneMeshes.emplace_back(Mesh::LoadFromMeshFile("Cylinder.msh"));
-    sceneMeshes.emplace_back(Mesh::LoadFromMeshFile("Cone.msh"));
+    /*OBJMesh* objSphere = new OBJMesh("Starfield/spaceship.obj");
+    sceneMeshes.emplace_back(objSphere);*/
+
 
     sceneDiffuse = SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
     sceneBump = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
     SetTextureRepeating(sceneDiffuse, true);
     SetTextureRepeating(sceneBump, true);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
 
     sceneTransforms.resize(4);
-    sceneTransforms[0] = Matrix4::Rotation(90, Vector3(1, 0, 0)) * Matrix4::Scale(Vector3(10, 10, 1));
+    sceneTransforms[0] = Matrix4::Rotation(90, Vector3(1, 0, 0)) * Matrix4::Scale(Vector3(1, 1, 1));
     sceneTime = 0.0f;
     init = true;
 }

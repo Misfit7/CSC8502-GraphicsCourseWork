@@ -1,9 +1,10 @@
 #include "Renderer.h"
 #include "CubeRobot.h"
 #include <algorithm>
+#include <nclgl/OBJMesh.h>
 
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
-    camera = new Camera(0.0f, 0.0f, (Vector3(0, 100, 750.0f)));
+    camera = new Camera(0.0f, 0.0f, (Vector3(0, 50, 50.0f)));
     quad = Mesh::GenerateQuad();
     cube = Mesh::LoadFromMeshFile("OffsetCubeY.msh");
     shader = new Shader("SceneVertex.glsl", "SceneFragment.glsl");
@@ -12,16 +13,19 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
         return;
     }
     root = new SceneNode();
-    for (int i = 0; i < 5; ++i) {
-        SceneNode* s = new SceneNode();
-        s->SetColour(Vector4(1.0f, 1.0f, 1.0f, 0.5f));
-        s->SetTransform(Matrix4::Translation(Vector3(0, 100.0f, -300.0f + 100.0f + 100 * i)));
-        s->SetModelScale(Vector3(100.0f, 100.0f, 100.0f));
-        s->SetBoundingRadius(100.0f);
-        s->SetMesh(quad);
-        s->SetTexture(texture);
-        root->AddChild(s);
-    }
+
+    SceneNode* s = new SceneNode();
+    s->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    s->SetTransform(Matrix4::Translation(Vector3(0, 100.0f, -300.0f + 100.0f)));
+    s->SetModelScale(Vector3(1.0f, 1.0f, 1.0f));
+    s->SetBoundingRadius(100.0f);
+    OBJMesh* objSphere = new OBJMesh("Starfield/spaceship.obj");
+    s->SetMesh(objSphere);
+    texture = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/spaceshipT.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+    s->SetTexture(texture);
+    s->SetBoundingRadius(10.0f);
+    root->AddChild(s);
+
     root->AddChild(new CubeRobot(cube));
     projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
     glEnable(GL_DEPTH_TEST);

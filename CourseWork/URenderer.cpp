@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-URenderer::URenderer(Window& parent) : OGLRenderer(parent) {
-    camera = new Camera(-45.0f, 0.0f, (Vector3(2200.0f, 1000.0f, 1000.0f)));
+URenderer::URenderer(Window& parent) :OGLRenderer(parent) {
+    camera = new Camera(-45.0f, 45.0f, (Vector3(3987.32f, 3017.49f, 1487.84f)));
     light = new Light(Vector3(0.0f, 0.0f, 0.0f), Vector4(1, 1, 1, 1), 1000.0f);
     quad = Mesh::GenerateQuad();
 
@@ -25,11 +25,23 @@ URenderer::URenderer(Window& parent) : OGLRenderer(parent) {
     solar = new SolarSystem();
     root->AddChild(solar);
 
+    //spaceship
+    spaceship = new SceneNode();
+    spaceship->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    spaceship->SetTransform(Matrix4::Translation(Vector3(3970.0f, 2990.0f, 1470.0f)));
+    spaceship->SetTransform(spaceship->GetTransform() * Matrix4::Rotation(135.0f, Vector3(0, 1, 0)));
+    spaceship->SetModelScale(Vector3(1.0f, 1.0f, 1.0f));
+    spaceship->SetBoundingRadius(100.0f);
+    OBJMesh* objSphere = new OBJMesh("Starfield/spaceship.obj");
+    spaceship->SetMesh(objSphere);
+    texture = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/spaceshipT.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+    spaceship->SetTexture(texture);
+    root->AddChild(spaceship);
+
     //glFuntion
-    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //transparent
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //transparent glass
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     init = true;
 }
@@ -52,7 +64,7 @@ void URenderer::AutoScene() {
 
 void URenderer::UpdateScene(float dt) {
     camera->UpdateCamera(10 * dt);
-
+    //cout << camera->GetPosition().x << " " << camera->GetPosition().y << " " << camera->GetPosition().z << endl;
     viewMatrix = camera->BuildViewMatrix();
     frameFrustum.FromMatrix(projMatrix * viewMatrix);
     root->Update(dt);
@@ -102,6 +114,11 @@ void URenderer::DrawNode(SceneNode* n) {
     }
 }
 
+void URenderer::ClearNodeLists() {
+    transparentNodeList.clear();
+    nodeList.clear();
+}
+
 void URenderer::DrawSkybox() {
     glDepthMask(GL_FALSE);
 
@@ -117,8 +134,21 @@ void URenderer::DrawMainScene() {
     BuildNodeLists(root);
     SortNodeLists();
     BindShader(sceneShader);
-    UpdateShaderMatrices();
+    SetShaderLight(*light);
+    viewMatrix = camera->BuildViewMatrix();
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+
     glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
+    glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "bumpTex"), 1);
+    glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "shadowTex"), 2);
+
+    glUniform3fv(glGetUniformLocation(sceneShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, shadowTex);
+
+    UpdateShaderMatrices();
+
     DrawNodes();
     ClearNodeLists();
 
@@ -134,9 +164,4 @@ void URenderer::RenderScene() {
     DrawSkybox();
     DrawMainScene();
     DrawShadowScene();
-}
-
-void URenderer::ClearNodeLists() {
-    transparentNodeList.clear();
-    nodeList.clear();
 }

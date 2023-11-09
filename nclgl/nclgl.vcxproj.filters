@@ -39,6 +39,7 @@
     <ClCompile Include="GeometryNode.cpp" />
     <ClCompile Include="HeightMap.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="OBJMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -89,6 +90,8 @@
     <ClInclude Include="GeometryNode.h" />
     <ClInclude Include="HeightMap.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="OBJMesh.h" />
+    <ClInclude Include="ChildMeshInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GLAD">

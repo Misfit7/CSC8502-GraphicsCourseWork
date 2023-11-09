@@ -1,5 +1,6 @@
 #pragma once
 #include "../nclgl/SceneNode.h"
+#include "../nclgl/OBJMesh.h"
 #include <string>
 
 using namespace std;
@@ -11,6 +12,7 @@ public:
     ~SolarSystem(void) {};
     void Update(float dt) override;
     Vector3 getEarthPosiotion() { return earth->GetWorldTransform().GetPositionVector(); };
+    vector<Matrix4> GetSceneTransforms() { return sceneTransforms; }
 
 protected:
     Mesh* m;
@@ -29,5 +31,16 @@ protected:
     SceneNode* soilring; //6
     SceneNode* tianwang; //7
     SceneNode* haiwang; //8
+
+    SceneNode* mercuryR; //1
+    SceneNode* goldR; //2
+    SceneNode* earthR; //3
+    SceneNode* fireR; //4
+    SceneNode* woodR; //5
+    SceneNode* soilR; //6
+    SceneNode* tianwangR; //7
+    SceneNode* haiwangR; //8
+
+    vector<Matrix4> sceneTransforms;
 
 };
