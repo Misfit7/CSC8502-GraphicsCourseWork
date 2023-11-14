@@ -58,10 +58,11 @@ Renderer ::~Renderer(void) {
 }
 
 void Renderer::UpdateScene(float dt) {
-    camera->UpdateCamera(dt);
+    camera->UpdateCamera(10 * dt);
     viewMatrix = camera->BuildViewMatrix();
     waterRotate += dt * 2.0f; // 2 degrees a second
     waterCycle += dt * 0.25f; // 10 units a second
+    sceneTime += dt;
 }
 
 void Renderer::RenderScene() {
@@ -105,7 +106,6 @@ void Renderer::DrawHeightmap() {
 
 void Renderer::DrawWater() {
     BindShader(reflectShader);
-    // SetShaderLight (* light ); // No lighting in this shader !
 
     glUniform3fv(glGetUniformLocation(reflectShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
@@ -116,6 +116,11 @@ void Renderer::DrawWater() {
     glUniform1i(glGetUniformLocation(reflectShader->GetProgram(), "cubeTex"), 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+
+    glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "time"), sceneTime);
+    glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "speed"), 1.25);
+    glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "amount"), 0.01);
+    glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "height"), 0.08);
 
     Vector3 hSize = heightMap->GetHeightmapSize();
 

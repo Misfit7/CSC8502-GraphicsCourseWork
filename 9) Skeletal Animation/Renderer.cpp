@@ -12,10 +12,9 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
     if (!shader->LoadSuccess()) {
         return;
     }
-    mesh = Mesh::LoadFromMeshFile("Role_T.msh");
-    anim = new MeshAnimation("Role_T.anm");
-    material = new MeshMaterial("Role_T.mat");
-
+    mesh = Mesh::LoadFromMeshFile("Starfield/CrabMonster.msh");
+    anim = new MeshAnimation("Starfield/CrabMonster.anm");
+    material = new MeshMaterial("Starfield/CrabMonster.mat");
     for (int i = 0; i < mesh->GetSubMeshCount(); ++i) {
         const MeshMaterialEntry* matEntry = material->GetMaterialForLayer(i);
         const string* filename = nullptr;

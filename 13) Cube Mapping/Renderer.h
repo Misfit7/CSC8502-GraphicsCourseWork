@@ -19,6 +19,7 @@ protected:
     Shader* lightShader;
     Shader* reflectShader;
     Shader* skyboxShader;
+    Shader* FlowWaterShader;
 
     HeightMap* heightMap;
     Mesh* quad;
@@ -33,4 +34,7 @@ protected:
 
     float waterRotate;
     float waterCycle;
+
+    float sceneTime = 0.0f;
+
 };

@@ -138,11 +138,13 @@
   <ItemGroup>
     <ClCompile Include="GRenderer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Rain.cpp" />
     <ClCompile Include="SolarSystem.cpp" />
     <ClCompile Include="URenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GRenderer.h" />
+    <ClInclude Include="Rain.h" />
     <ClInclude Include="SolarSystem.h" />
     <ClInclude Include="URenderer.h" />
   </ItemGroup>

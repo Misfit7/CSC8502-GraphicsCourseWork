@@ -11,12 +11,8 @@ public:
     SolarSystem();
     ~SolarSystem(void) {};
     void Update(float dt) override;
-    Vector3 getEarthPosiotion() { return earth->GetWorldTransform().GetPositionVector(); };
-    vector<Matrix4> GetSceneTransforms() { return sceneTransforms; }
-
-protected:
-    Mesh* m;
-    GLuint texture;
+    SceneNode* GetSun() { return sun; };
+    SceneNode* GetSoilring() { return soilring; };
 
     //planet
     SceneNode* sun; //0
@@ -32,6 +28,10 @@ protected:
     SceneNode* tianwang; //7
     SceneNode* haiwang; //8
 
+protected:
+    Mesh* m;
+    GLuint texture;
+
     SceneNode* mercuryR; //1
     SceneNode* goldR; //2
     SceneNode* earthR; //3
@@ -40,7 +40,5 @@ protected:
     SceneNode* soilR; //6
     SceneNode* tianwangR; //7
     SceneNode* haiwangR; //8
-
-    vector<Matrix4> sceneTransforms;
 
 };

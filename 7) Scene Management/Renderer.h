@@ -18,10 +18,13 @@ protected:
     void DrawNode(SceneNode* n);
     SceneNode* root;
     Camera* camera;
-    Mesh* quad;
-    Mesh* cube;
     Shader* shader;
+
+    Mesh* cube;
+    Mesh* quad;
+
     GLuint texture;
+
     Frustum frameFrustum;
     vector <SceneNode*> transparentNodeList;
     vector <SceneNode*> nodeList;

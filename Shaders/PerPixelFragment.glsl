@@ -21,6 +21,10 @@ void main(void) {
     vec3 halfDir = normalize(incident + viewDir);
 
     vec4 diffuse = texture (diffuseTex, IN.texCoord);
+    if (diffuse.a < 0.05f)
+    {
+        discard;
+    }
     float lambert = max(dot(incident, IN.normal), 0.0f);
     float distance = length(lightPos - IN.worldPos);
     float attenuation = 1.0 - clamp(distance / lightRadius, 0.0, 1.0);

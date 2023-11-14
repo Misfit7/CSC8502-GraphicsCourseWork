@@ -8,34 +8,33 @@ int main() {
         return -1;
     }
 
-    OGLRenderer* renderer;
-    URenderer* Urenderer = new URenderer(w);
-    GRenderer* Grenderer;
-    renderer = Urenderer;
-    if (!Urenderer->HasInitialised()) {
+    OGLRenderer* renderer = nullptr;
+    URenderer* Urenderer = nullptr;
+    GRenderer* Grenderer = new GRenderer(w);
+    renderer = Grenderer;
+    if (!renderer->HasInitialised()) {
         return -1;
     }
 
     w.LockMouseToWindow(true);
     w.ShowOSPointer(false);
 
-    bool autoPlay = true;
+    bool autoPlay = 0;
 
     while (w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
         renderer->UpdateScene(w.GetTimer()->GetTimeDeltaSeconds());
-        renderer->RenderScene();
         renderer->SwapBuffers();
         if (autoPlay) { renderer->AutoScene(); };
 
         //space
         if (Window::GetKeyboard()->KeyDown(KEYBOARD_F1)) {
-            delete Grenderer;
+            if (Grenderer) { delete Grenderer; };
             Urenderer = new URenderer(w);
             renderer = Urenderer;
         }
         //ground
         if (Window::GetKeyboard()->KeyDown(KEYBOARD_F2)) {
-            delete Urenderer;
+            if (Urenderer) { delete Urenderer; };
             Grenderer = new GRenderer(w);
             renderer = Grenderer;
         }

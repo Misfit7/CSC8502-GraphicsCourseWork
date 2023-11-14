@@ -25,13 +25,21 @@ public:
     std::vector <SceneNode*>::const_iterator GetChildIteratorStart() { return children.begin(); }
     std::vector <SceneNode*>::const_iterator GetChildIteratorEnd() { return children.end(); }
 
+    void DrawSubmesh(const OGLRenderer& r);
+
     float GetBoundingRadius() const { return boundingRadius; }
     void SetBoundingRadius(float f) { boundingRadius = f; }
     float GetCameraDistance() const { return distanceFromCamera; }
     void SetCameraDistance(float f) { distanceFromCamera = f; }
     void SetTexture(GLuint tex) { texture = tex; }
     GLuint GetTexture() const { return texture; }
+    void SetBump(GLuint bmp) { bump = bmp; }
+    GLuint GetBump() const { return bump; }
+    void SetTextures(GLuint tex) { matTextures.emplace_back(tex); }
+    vector<GLuint>& GetTextures() { return matTextures; }
     static bool CompareByCameraDistance(SceneNode* a, SceneNode* b) { return (a->distanceFromCamera < b->distanceFromCamera) ? true : false; }
+    void SetSubMesh(bool sb) { bsubMesh = sb; };
+    bool GetSubMesh() { return bsubMesh; };
 
 protected:
     SceneNode* parent = NULL;
@@ -45,4 +53,8 @@ protected:
     float distanceFromCamera = 0.0f;
     float boundingRadius = 1.0f;
     GLuint texture = 0;
+    GLuint bump = 0;
+    vector <GLuint> matTextures;
+
+    bool bsubMesh = 0;
 };

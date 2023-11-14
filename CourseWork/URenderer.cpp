@@ -3,15 +3,16 @@
 #include <algorithm>
 
 URenderer::URenderer(Window& parent) :OGLRenderer(parent) {
-    camera = new Camera(-45.0f, 45.0f, (Vector3(3987.32f, 3017.49f, 1487.84f)));
-    light = new Light(Vector3(0.0f, 0.0f, 0.0f), Vector4(1, 1, 1, 1), 1000.0f);
+    camera = new Camera(0.0f, 0.0f, (Vector3(2987.32f, 2017.49f, 1487.84f)));
+    camera1 = new Camera();
+    light = new Light(Vector3(0.0f, 0.0f, 0.0f), Vector4(1, 1, 1, 1), 10000.0f);
     quad = Mesh::GenerateQuad();
 
     //shader
     skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
     sceneShader = new Shader("SceneVertex.glsl", "SceneFragment.glsl");
-    shadowShader = new Shader("shadowVert.glsl", "shadowFrag.glsl");
-    if (!sceneShader->LoadSuccess() || !skyboxShader->LoadSuccess() || !shadowShader->LoadSuccess()) {
+    lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
+    if (!sceneShader->LoadSuccess() || !skyboxShader->LoadSuccess()) {
         return;
     }
 
@@ -24,24 +25,26 @@ URenderer::URenderer(Window& parent) :OGLRenderer(parent) {
     root = new SceneNode();
     solar = new SolarSystem();
     root->AddChild(solar);
+    sun = solar->GetSun();
+    soilring = solar->GetSoilring();
 
     //spaceship
     spaceship = new SceneNode();
     spaceship->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    spaceship->SetTransform(Matrix4::Translation(Vector3(3970.0f, 2990.0f, 1470.0f)));
-    spaceship->SetTransform(spaceship->GetTransform() * Matrix4::Rotation(135.0f, Vector3(0, 1, 0)));
+    spaceship->SetTransform(Matrix4::Translation(Vector3(2987.32f, 2000.49f, 1487.84f)));
     spaceship->SetModelScale(Vector3(1.0f, 1.0f, 1.0f));
-    spaceship->SetBoundingRadius(100.0f);
+    spaceship->SetBoundingRadius(1.0f);
     OBJMesh* objSphere = new OBJMesh("Starfield/spaceship.obj");
     spaceship->SetMesh(objSphere);
-    texture = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/spaceshipT.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
-    spaceship->SetTexture(texture);
+    Shiptexture = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/spaceshipT.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+    spaceship->SetTexture(Shiptexture);
+    spaceship->SetBump(SOIL_load_OGL_texture(TEXTUREDIR"Starfield/spaceshipbump.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
     root->AddChild(spaceship);
 
     //glFuntion
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //transparent glass
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     init = true;
 }
@@ -56,22 +59,58 @@ URenderer ::~URenderer(void) {
 }
 
 void URenderer::AutoScene() {
-    Vector3 earthPosition = solar->getEarthPosiotion();
-    earthPosition.y += 1000.0f;
-    camera->SetPosition(earthPosition);
+    Vector3 earthPosition = solar->earth->GetWorldTransform().GetPositionVector();
+    earthPosition.y += 1000;
+    Vector3 shipPosition = spaceship->GetWorldTransform().GetPositionVector();
+    //spaceship->SetTransform();
+    camera->SetPosition(spaceship->GetTransform().GetPositionVector());
     camera->SetYaw(-90.0f);
 }
 
 void URenderer::UpdateScene(float dt) {
     camera->UpdateCamera(10 * dt);
-    //cout << camera->GetPosition().x << " " << camera->GetPosition().y << " " << camera->GetPosition().z << endl;
-    viewMatrix = camera->BuildViewMatrix();
+    //cout << camera->GetPosition();
+    Vector3 camPos = camera->GetPosition();
+    Vector3 shipPos = spaceship->GetTransform().GetPositionVector();
+    if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_V)) {
+        switch (viewFlag)
+        {
+        case 0:
+            camera->SetPosition(shipPos);
+            free = 0;
+            dis = 3;
+            break;
+        case 1:
+            camera->SetPosition(shipPos);
+            free = 0;
+            dis = 8;
+            break;
+        case 2:
+            free = 1;
+            break;
+        default:
+            break;
+        }
+        viewFlag++;
+        if (viewFlag >= 3) viewFlag = 0;
+    }
+    if (!free)
+    {
+        spaceship->SetTransform(Matrix4::Translation(Vector3(camPos.x, camPos.y - dis, camPos.z)) * Matrix4::Rotation(camera->GetYaw() + 90, Vector3(0, 1, 0)));
+    }
     frameFrustum.FromMatrix(projMatrix * viewMatrix);
     root->Update(dt);
+    if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_F)) { splitView = !splitView; }
+    if (!splitView) { RenderScene(); }
+    else if (splitView) {
+        camera1->SetPosition(Vector3(camPos.x + 12.5, camPos.y + 2, camPos.z + 30));
+        SplitRenderScene();
+    }
+
 }
 
 void URenderer::BuildNodeLists(SceneNode* from) {
-    if (frameFrustum.InsideFrustum(*from)) {
+    if (frameFrustum.InsideFrustum(*from) || from->GetCameraDistance() <= 50.0f) {
         Vector3 dir = from->GetWorldTransform().GetPositionVector() - camera->GetPosition();
         from->SetCameraDistance(Vector3::Dot(dir, dir));
         if (from->GetColour().w < 1.0f) {
@@ -102,15 +141,43 @@ void URenderer::DrawNodes() {
 
 void URenderer::DrawNode(SceneNode* n) {
     if (n->GetMesh()) {
+        if (n == soilring)
+        {
+            return;
+        }
         Matrix4 model = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
-        glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
-        glUniform4fv(glGetUniformLocation(sceneShader->GetProgram(), "nodeColour"), 1, (float*)&n->GetColour());
+        UpdateShaderMatrices();
+        glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, model.values);
+        glUniform4fv(glGetUniformLocation(currentShader->GetProgram(), "nodeColour"), 1, (float*)&n->GetColour());
         texture = n->GetTexture();
         glActiveTexture(GL_TEXTURE0);
         SetTextureRepeating(texture, true);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "useTexture"), texture);
+        glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "useTexture"), texture);
+        glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+        if (n->GetBump() != 0) {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, n->GetBump());
+            glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "bumpTex"), 1);
+        }
         n->Draw(*this);
+    }
+}
+
+void URenderer::DrawunLight(SceneNode* unLight) {
+    if (unLight->GetMesh()) {
+        BindShader(sceneShader);
+        Matrix4 model = unLight->GetWorldTransform() * Matrix4::Scale(unLight->GetModelScale());
+        UpdateShaderMatrices();
+        glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, model.values);
+        glUniform4fv(glGetUniformLocation(currentShader->GetProgram(), "nodeColour"), 1, (float*)&unLight->GetColour());
+        texture = unLight->GetTexture();
+        glActiveTexture(GL_TEXTURE0);
+        SetTextureRepeating(texture, true);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "useTexture"), texture);
+        glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+        unLight->Draw(*this);
     }
 }
 
@@ -133,35 +200,43 @@ void URenderer::DrawSkybox() {
 void URenderer::DrawMainScene() {
     BuildNodeLists(root);
     SortNodeLists();
-    BindShader(sceneShader);
+    BindShader(lightShader);
     SetShaderLight(*light);
-    viewMatrix = camera->BuildViewMatrix();
-    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
 
-    glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
-    glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "bumpTex"), 1);
-    glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "shadowTex"), 2);
-
-    glUniform3fv(glGetUniformLocation(sceneShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, shadowTex);
-
-    UpdateShaderMatrices();
+    glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
     DrawNodes();
-    ClearNodeLists();
-
-}
-
-void URenderer::DrawShadowScene()
-{
 
 }
 
 void URenderer::RenderScene() {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glViewport(0, 0, width, height);
+    viewMatrix = camera->BuildViewMatrix();
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 60.0f);
     DrawSkybox();
     DrawMainScene();
-    DrawShadowScene();
+    DrawunLight(sun);
+    DrawunLight(soilring);
+
+}
+
+void URenderer::SplitRenderScene() {
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    viewMatrix = camera->BuildViewMatrix();
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, ((float)width / 2) / (float)height, 60.0f);
+    glViewport(0, 0, width / 2, height);
+    DrawSkybox();
+    DrawMainScene();
+    DrawunLight(sun);
+    DrawunLight(soilring);
+
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, ((float)width) / (float)height, 60.0f);
+    viewMatrix = camera1->BuildViewMatrix();
+    glViewport(width / 2, 0, width, height);
+    DrawSkybox();
+    DrawMainScene();
+    DrawunLight(sun);
+    DrawunLight(soilring);
+
 }

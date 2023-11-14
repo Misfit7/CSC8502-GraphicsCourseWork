@@ -5,40 +5,39 @@ using namespace std;
 
 class Renderer :public OGLRenderer {
 public:
-	Renderer(Window& parent);
-	virtual ~Renderer(void);
-	virtual void RenderScene();
+    Renderer(Window& parent);
+    virtual ~Renderer(void);
+    virtual void RenderScene();
 
 protected:
-	MeshTriangle* triangle;
-	Shader* basicShader;
+    MeshTriangle* triangle;
+    Shader* basicShader;
 
 };
 
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
-	triangle = MeshTriangle::GenerateTriangle();
+    triangle = MeshTriangle::GenerateTriangle();
 
-	basicShader = new Shader("basicVertex.glsl", "colourFragment.glsl");
+    basicShader = new Shader("basicVertex.glsl", "colourFragment.glsl");
 
-	if (!basicShader->LoadSuccess()) {
-		return;
-	}
-	init = true;
+    if (!basicShader->LoadSuccess()) {
+        return;
+    }
+    init = true;
 }
 
 void Renderer::RenderScene() {
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-	// set windowSize as uniform
-	glUniform2f(glGetUniformLocation(basicShader->GetProgram(), "screen"), width, height);
+    // set windowSize as uniform
+    glUniform2f(glGetUniformLocation(basicShader->GetProgram(), "screen"), width, height);
 
-
-	BindShader(basicShader);
-	triangle->Draw();
+    BindShader(basicShader);
+    triangle->Draw();
 }
 
 Renderer ::~Renderer(void) {
-	delete triangle;
-	delete basicShader;
+    delete triangle;
+    delete basicShader;
 }

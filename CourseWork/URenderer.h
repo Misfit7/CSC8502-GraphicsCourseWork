@@ -14,19 +14,19 @@ public:
     ~URenderer(void);
     void RenderScene() override;
     void UpdateScene(float dt) override;
-
     void AutoScene();
+    void SplitRenderScene();
 
 protected:
     //draw
     void DrawSkybox();
     void DrawMainScene();
-    void DrawShadowScene();
+    void DrawunLight(SceneNode* unLight);
 
     Mesh* quad;
     GLuint cubeMap;
     GLuint texture;
-    GLuint shadowTex;
+    GLuint Shiptexture;
 
     //light and skybox
     Shader* lightShader;
@@ -40,6 +40,8 @@ protected:
     //solar system eight star
     SceneNode* root;
     SolarSystem* solar;
+    SceneNode* sun;
+    SceneNode* soilring;
 
     //build sort draw nodelist
     vector <SceneNode*> transparentNodeList;
@@ -50,9 +52,16 @@ protected:
     void DrawNodes();
     void DrawNode(SceneNode* n);
 
+    //switchView
+    int viewFlag = 1;
+    int dis = 8;
+    bool free = 0;
+
     //camera
     Light* light;
     Camera* camera;
+    Camera* camera1;
     Frustum frameFrustum;
+    bool splitView = 0;
 
 };
