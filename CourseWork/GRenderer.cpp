@@ -5,17 +5,16 @@
 
 using namespace std;
 
+#define SHADOWSIZE 2048
+const int POST_PASSES = 10;
+
 GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
     quad = Mesh::GenerateQuad();
-
     heightMap = new HeightMap(TEXTUREDIR"Starfield/noise.png");
 
     waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
-
     earthTex = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/grass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
-
     earthBump = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/grassbump.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
-
     cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"Starfield/day_w.jpg", TEXTUREDIR"Starfield/day_e.jpg",
         TEXTUREDIR"Starfield/day_u.jpg", TEXTUREDIR"Starfield/day_d.jpg",
         TEXTUREDIR"Starfield/day_s.jpg", TEXTUREDIR"Starfield/day_n.jpg", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0);
@@ -30,11 +29,13 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
 
     reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
     skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
-    lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
-    sceneShader = new Shader("SceneVertex.glsl", "SceneFragment.glsl");
+    //lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
+    lightShader = new Shader("shadowscenevert.glsl", "shadowscenefrag.glsl");
     textureShader = new Shader("TexturedVertex.glsl", "TexturedFragment.glsl");
     shadowShader = new Shader("shadowVert.glsl", "shadowFrag.glsl");
-    skinShader = new Shader("SkinningVertex.glsl", "TexturedFragment.glsl");
+    skinShader = new Shader("SkinningVertex.glsl", "PerPixelFragment.glsl");
+    sceneShader = new Shader("TexturedVertex.glsl", "TexturedFragment.glsl");
+    processShader = new Shader("TexturedVertex.glsl", "processfrag.glsl");
 
     if (!reflectShader->LoadSuccess() || !skyboxShader->LoadSuccess() || !lightShader->LoadSuccess()) {
         return;
@@ -43,13 +44,14 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
     Vector3 heightmapSize = heightMap->GetHeightmapSize();
 
     camera = new Camera(-45.0f, 0.0f, heightmapSize * Vector3(0.5f, 2.5f, 0.5f));
-    //change light position in UpdateScene() to mimic sun rise and down;
-    light = new Light(heightmapSize * Vector3(0.5f, 2.5f, 0.5f), Vector4(1, 1, 1, 1), max(heightmapSize.x, heightmapSize.z) * 10);
+    //change light position in UpdateScene();
+    light = new Light(Vector3(heightmapSize.x,
+        heightmapSize.y, 0), Vector4(1, 1, 1, 1), heightmapSize.z * 10);
 
     root = new SceneNode();
     root->SetTransform(Matrix4::Translation(camera->GetPosition()));
     root1 = new SceneNode();
-    root1->SetTransform(Matrix4::Translation(camera->GetPosition()));
+    root1->SetTransform(Matrix4::Translation(Vector3(0, 0, 0)));
     root2 = new SceneNode();
     root2->SetTransform(Matrix4::Translation(camera->GetPosition()));
     //spaceship
@@ -65,12 +67,12 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
     spaceship->SetBump(SOIL_load_OGL_texture(TEXTUREDIR"Starfield/spaceshipbump.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
     root->AddChild(spaceship);
     //tree
-    srand(unsigned(time(0)));
+    /*srand(unsigned(time(0)));
     for (int i = 0; i < 25; i++)
     {
         tree = new SceneNode();
         tree->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-        tree->SetTransform(Matrix4::Translation(Vector3(8216 + (rand() % 1000 - 500), -525.0f, 8216 + (rand() % 1000 - 500))));
+        tree->SetTransform(Matrix4::Translation(Vector3(8216 + (rand() % 500 - 250), -525.0f, 8216 + (rand() % 500 - 250))));
         tree->SetModelScale(Vector3(10.0f, 10.0f, 10.0f));
         tree->SetBoundingRadius(10.0f);
         mesh = Mesh::LoadFromMeshFile("Starfield/Tree.msh");
@@ -86,7 +88,7 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
             tree->SetTextures(texID);
         }
         root->AddChild(tree);
-    }
+    }*/
     //plane
     plane = new SceneNode();
     plane->SetColour(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -107,27 +109,29 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
     }
     root->AddChild(plane);
     //building
-    OBJMesh* obj = new OBJMesh("Starfield/ExportScene.unity_2.obj");
+    Mesh* obj = Mesh::LoadFromMeshFile("Cube.msh");
     buildingTex = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/Shiny_Glass_basecolor.png", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
     SetTextureRepeating(buildingTex, true);
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 1; i++)
     {
         building = new SceneNode();
         building->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-        building->SetTransform(Matrix4::Translation(Vector3(-1000.0f + i * 700, -1200.0f, -3000.0f + i * 700)));
-        building->SetModelScale(Vector3(30.0f, 30.0f, 30.0f));
-        building->SetBoundingRadius(30.0f);
+        Matrix4 trs = Matrix4::Translation(Vector3(7216.0f + i * 700, 750.0f, 6500 + i * 700));
+        building->SetTransform(trs);
+        building->SetModelScale(Vector3(500.0f, 1500.0f, 500.0f));
+        building->SetBoundingRadius(1500.0f);
         building->SetMesh(obj);
         building->SetTexture(buildingTex);
         building->SetBump(SOIL_load_OGL_texture(TEXTUREDIR"Starfield/Shiny_Glass_normal.png", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-        root->AddChild(building);
+        Vbuilding.emplace_back(building);
+        sceneTransforms.emplace_back(trs);
     }
     //Boss
     boss = new SceneNode();
     boss->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    boss->SetTransform(Matrix4::Translation(Vector3(0.0f, 0.0f, 0.0f)));
-    boss->SetModelScale(Vector3(20.0f, 20.0f, 20.0f));
-    boss->SetBoundingRadius(20.0f);
+    boss->SetTransform(Matrix4::Translation(Vector3(4300.0f, 60.0f, 3535.0f)));
+    boss->SetModelScale(Vector3(200.0f, 200.0f, 200.0f));
+    boss->SetBoundingRadius(200.0f);
     bossmesh = Mesh::LoadFromMeshFile("Starfield/CrabMonster.msh");
     bossanim = new MeshAnimation("Starfield/CrabMonster.anm");
     bossmaterial = new MeshMaterial("Starfield/CrabMonster.mat");
@@ -146,6 +150,51 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
     rain = new Rain(camera->GetPosition());
     root2->AddChild(rain);
 
+    //shadow
+    glGenTextures(1, &shadowTex);
+    glBindTexture(GL_TEXTURE_2D, shadowTex);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glGenFramebuffers(1, &shadowFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTex, 0);
+    glDrawBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOWSIZE, SHADOWSIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //postprocessing
+    glGenTextures(1, &bufferDepthTex);
+    glBindTexture(GL_TEXTURE_2D, bufferDepthTex);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+    for (int i = 0; i < 2; ++i) {
+        glGenTextures(1, &bufferColourTex[i]);
+        glBindTexture(GL_TEXTURE_2D, bufferColourTex[i]);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    }
+    glGenFramebuffers(1, &bufferFBO);
+    glGenFramebuffers(1, &processFBO);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, bufferFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, bufferDepthTex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, bufferDepthTex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[0], 0);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE || !bufferDepthTex || !bufferColourTex[0]) {
+        return;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     waterRotate = 0.0f;
@@ -163,6 +212,9 @@ GRenderer ::~GRenderer(void) {
     delete skyboxShader;
     delete lightShader;
     delete light;
+
+    glDeleteTextures(1, &shadowTex);
+    glDeleteFramebuffers(1, &shadowFBO);
 }
 
 void GRenderer::BuildNodeLists(SceneNode* from) {
@@ -202,15 +254,19 @@ void GRenderer::DrawNode(SceneNode* n) {
         glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, model.values);
         glUniform4fv(glGetUniformLocation(currentShader->GetProgram(), "nodeColour"), 1, (float*)&n->GetColour());
         texture = n->GetTexture();
-        glActiveTexture(GL_TEXTURE0);
         SetTextureRepeating(texture, true);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "useTexture"), texture);
         glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+        glActiveTexture(GL_TEXTURE0);
+        glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "useTexture"), texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
         if (n->GetBump() != 0) {
+            glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "bumpTex"), 3);
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, n->GetBump());
-            glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "bumpTex"), 3);
+
+            glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "shadowTex"), 4);
+            glActiveTexture(GL_TEXTURE4);
+            glBindTexture(GL_TEXTURE_2D, shadowTex);
         }
         if (n->GetSubMesh())
             n->DrawSubmesh(*this);
@@ -222,7 +278,6 @@ void GRenderer::DrawNode(SceneNode* n) {
 void GRenderer::ClearNodeLists() {
     transparentNodeList.clear();
     nodeList.clear();
-
 }
 
 void GRenderer::AutoScene() {
@@ -231,13 +286,16 @@ void GRenderer::AutoScene() {
 
 void GRenderer::AutoSun() {
     Vector3 heightmapSize = heightMap->GetHeightmapSize();
-    light->SetPosition(Vector3(heightmapSize.x * 0.5 + cos(sceneTime) * (0.5 * heightmapSize.x),
-        heightmapSize.y * 2.0 + sin(sceneTime) * (0.5 * heightmapSize.z), heightmapSize.z * 0.5));
+    light->SetPosition(Vector3(heightmapSize.x * 0.5 + cos(sceneTime) * (heightmapSize.x * 0.5),
+        2000 + sin(sceneTime) * 1000, 5600));
 }
 
 void GRenderer::UpdateScene(float dt) {
     camera->UpdateCamera(10 * dt);
-    cout << camera->GetPosition();
+    Vector3 camPos = camera->GetPosition();
+    if (camPos.y <= 15) { camera->SetPosition(Vector3(camPos.x, 10, camPos.z)); };
+    //cout << camPos;
+    //cout << light->GetPosition();
     waterRotate += dt * 0.25f; // 2 degrees a second
     waterCycle += dt * 0.25f; // 10 units a second
 
@@ -247,12 +305,24 @@ void GRenderer::UpdateScene(float dt) {
         currentFrame = (currentFrame + 1) % bossanim->GetFrameCount();
         frameTime += 1.0f / bossanim->GetFrameRate();
     }
+    if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_T)) {
+        isAutoSun = !isAutoSun;
+    }
+    if (isAutoSun) { AutoSun(); }
 
-    //AutoSun();
     root->Update(dt);
     root1->Update(dt);
     root2->Update(dt);
-    RenderScene();
+    root2->SetTransform(Matrix4::Translation(Vector3(camPos.x + 10, camPos.y + 10, camPos.z - 10)));
+
+    if (camPos.y <= 60) {
+        DrawPostProcessScene();
+        //RenderScene();
+    }
+    else {
+        RenderScene();
+        //DrawPostProcessScene();
+    }
 
 }
 
@@ -264,11 +334,76 @@ void GRenderer::RenderScene() {
 
     DrawSkybox();
     DrawHeightmap();
-    //DrawMainScene();
-    //DrawActor();
+    DrawMainScene();
+    DrawBuilding();
+    //DrawShadowScene();
+    DrawActor();
     DrawRain();
     DrawWater();
 
+}
+
+void GRenderer::DrawPostProcessScene() {
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+    viewMatrix = camera->BuildViewMatrix();
+    glBindFramebuffer(GL_FRAMEBUFFER, bufferFBO);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    DrawSkybox();
+    DrawHeightmap();
+    DrawMainScene();
+    DrawBuilding();
+    DrawActor();
+    DrawRain();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    DrawPProcess();
+    PresentScene();
+
+}
+
+void GRenderer::DrawPProcess() {
+    glBindFramebuffer(GL_FRAMEBUFFER, processFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    BindShader(processShader);
+    modelMatrix.ToIdentity();
+    viewMatrix.ToIdentity();
+    projMatrix.ToIdentity();
+    UpdateShaderMatrices();
+
+    glDisable(GL_DEPTH_TEST);
+
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(glGetUniformLocation(processShader->GetProgram(), "sceneTex"), 0);
+    for (int i = 0; i < POST_PASSES; ++i) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
+        glUniform1i(glGetUniformLocation(processShader->GetProgram(), "isVertical"), 0);
+        glBindTexture(GL_TEXTURE_2D, bufferColourTex[0]);
+        quad->Draw();
+        // Now to swap the colour buffers , and do the second blur pass
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[0], 0);
+        glUniform1i(glGetUniformLocation(processShader->GetProgram(), "isVertical"), 1);
+        glBindTexture(GL_TEXTURE_2D, bufferColourTex[1]);
+        quad->Draw();
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+}
+
+void GRenderer::PresentScene() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    BindShader(sceneShader);
+    modelMatrix.ToIdentity();
+    viewMatrix.ToIdentity();
+    projMatrix.ToIdentity();
+    textureMatrix.ToIdentity();
+    UpdateShaderMatrices();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, bufferColourTex[0]);
+    glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
+    quad->Draw();
 }
 
 void GRenderer::DrawSkybox() {
@@ -295,8 +430,8 @@ void GRenderer::DrawHeightmap() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, earthBump);
 
-    modelMatrix.ToIdentity(); //New!
-    textureMatrix.ToIdentity(); //New!
+    modelMatrix.ToIdentity();
+    textureMatrix.ToIdentity();
 
     UpdateShaderMatrices();
 
@@ -305,6 +440,7 @@ void GRenderer::DrawHeightmap() {
 
 void GRenderer::DrawWater() {
     BindShader(reflectShader);
+    glDisable(GL_CULL_FACE);
 
     glUniform3fv(glGetUniformLocation(reflectShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
@@ -318,7 +454,7 @@ void GRenderer::DrawWater() {
 
     glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "time"), sceneTime);
     glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "speed"), 1.25);
-    glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "amount"), 0.01);
+    glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "count"), 0.01);
     glUniform1f(glGetUniformLocation(reflectShader->GetProgram(), "height"), 0.1);
 
     Vector3 hSize = heightMap->GetHeightmapSize();
@@ -331,6 +467,7 @@ void GRenderer::DrawWater() {
 
     UpdateShaderMatrices();
     quad->Draw();
+    glDisable(GL_CULL_FACE);
 }
 
 void GRenderer::DrawMainScene() {
@@ -338,6 +475,7 @@ void GRenderer::DrawMainScene() {
     SetShaderLight(*light);
     BuildNodeLists(root);
     SortNodeLists();
+
     UpdateShaderMatrices();
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -349,13 +487,70 @@ void GRenderer::DrawMainScene() {
     ClearNodeLists();
 }
 
+void GRenderer::DrawShadowScene() {
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, SHADOWSIZE, SHADOWSIZE);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+    BindShader(shadowShader);
+    Vector3 hmapsize = heightMap->GetHeightmapSize();
+    Vector3 ltPos = light->GetPosition();
+
+    viewMatrix = Matrix4::BuildViewMatrix(Vector3(ltPos), Vector3(5700, 125, 8000));
+    projMatrix = Matrix4::Perspective(1, 10000, 1, 45);
+    shadowMatrix = projMatrix * viewMatrix; // used later
+
+    for (int i = 0; i < 1; ++i) {
+        modelMatrix = sceneTransforms[i] * Matrix4::Scale(Vector3(1, 1, 1));
+        UpdateShaderMatrices();
+        Vbuilding[i]->GetMesh()->Draw();
+    }
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glViewport(0, 0, width, height);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+    viewMatrix = camera->BuildViewMatrix();
+}
+
+void GRenderer::DrawBuilding() {
+    BindShader(lightShader);
+    SetShaderLight(*light);
+    viewMatrix = camera->BuildViewMatrix();
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+
+    glUniform3fv(glGetUniformLocation(lightShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
+
+    glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex"), 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, buildingTex);
+
+    glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "bumpTex"), 1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, building->GetBump());
+
+    glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "shadowTex"), 2);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, shadowTex);
+
+    for (int i = 0; i < 1; ++i) {
+        modelMatrix = sceneTransforms[i] * Matrix4::Scale(Vbuilding[i]->GetModelScale());
+        UpdateShaderMatrices();
+        Vbuilding[i]->GetMesh()->Draw();
+    }
+}
+
 void GRenderer::DrawActor() {
     BindShader(skinShader);
+    SetShaderLight(*light);
     BuildNodeLists(root1);
     SortNodeLists();
     UpdateShaderMatrices();
 
-    vector < Matrix4 > frameMatrices;
+    vector <Matrix4> frameMatrices;
 
     const Matrix4* invBindPose = bossmesh->GetInverseBindPose();
     const Matrix4* frameData = bossanim->GetJointData(currentFrame);
@@ -375,7 +570,6 @@ void GRenderer::DrawActor() {
 
 void GRenderer::DrawRain() {
     BindShader(textureShader);
-    //SetShaderLight(*light);
     BuildNodeLists(root2);
     SortNodeLists();
     UpdateShaderMatrices();

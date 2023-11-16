@@ -21,6 +21,8 @@ protected:
     GLuint sceneBump;
     float sceneTime;
 
+    Mesh* mesh1;
+
     Shader* sceneShader;
     Shader* shadowShader;
 

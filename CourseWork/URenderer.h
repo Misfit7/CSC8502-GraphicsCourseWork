@@ -14,14 +14,16 @@ public:
     ~URenderer(void);
     void RenderScene() override;
     void UpdateScene(float dt) override;
+
     void AutoScene();
-    void SplitRenderScene();
 
 protected:
     //draw
     void DrawSkybox();
     void DrawMainScene();
     void DrawunLight(SceneNode* unLight);
+
+    void SplitRenderScene();
 
     Mesh* quad;
     GLuint cubeMap;
@@ -63,5 +65,9 @@ protected:
     Camera* camera1;
     Frustum frameFrustum;
     bool splitView = 0;
+
+    //autoplay
+    float playTime = 0.0f;
+    bool autoPlay = false;
 
 };

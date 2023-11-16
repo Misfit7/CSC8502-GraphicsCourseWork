@@ -28,6 +28,9 @@ protected:
     void DrawTree();
     void DrawActor();
     void DrawRain();
+    void DrawShadowScene();
+    void DrawBuilding();
+    void DrawPostProcessScene();
 
     Shader* lightShader;
     Shader* reflectShader;
@@ -36,7 +39,9 @@ protected:
     Shader* textureShader;
     Shader* shadowShader;
     Shader* skinShader;
+    Shader* processShader;
 
+    //map
     HeightMap* heightMap;
     Mesh* quad;
 
@@ -62,7 +67,9 @@ protected:
     SceneNode* plane;
     Mesh* planemesh;
     //building
+    SceneNode* buildings;
     SceneNode* building;
+    vector<SceneNode*> Vbuilding;
 
     //build sort draw nodelist
     vector <SceneNode*> transparentNodeList;
@@ -74,9 +81,11 @@ protected:
     void DrawNode(SceneNode* n);
     Frustum frameFrustum;
 
+    //camera
     Light* light;
     Camera* camera;
 
+    //material
     GLuint texture;
     GLuint cubeMap;
     GLuint waterTex;
@@ -85,11 +94,30 @@ protected:
     GLuint shipTexture;
     GLuint buildingTex;
 
+    //update
     float sceneTime = 0.0f;
     float waterRotate;
     float waterCycle;
 
+    //sun
+    bool isAutoSun = 0;
     void AutoSun();
 
+    //rain
     Rain* rain;
+
+    //shadow
+    vector <Mesh*> sceneMeshes;
+    vector <Matrix4> sceneTransforms;
+    GLuint shadowTex;
+    GLuint shadowFBO;
+
+    //postprocessing
+    GLuint bufferFBO;
+    GLuint processFBO;
+    GLuint bufferColourTex[2];
+    GLuint bufferDepthTex;
+    void DrawPProcess();
+    void PresentScene();
+
 };

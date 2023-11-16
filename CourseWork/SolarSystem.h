@@ -31,6 +31,7 @@ public:
 protected:
     Mesh* m;
     GLuint texture;
+    GLuint Bump;
 
     SceneNode* mercuryR; //1
     SceneNode* goldR; //2

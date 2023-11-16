@@ -59,19 +59,19 @@ URenderer ::~URenderer(void) {
 }
 
 void URenderer::AutoScene() {
-    Vector3 earthPosition = solar->earth->GetWorldTransform().GetPositionVector();
-    earthPosition.y += 1000;
+    Vector3 firePosition = solar->fire->GetWorldTransform().GetPositionVector();
+    firePosition.y += 100;
+    camera->SetPosition(firePosition);
     Vector3 shipPosition = spaceship->GetWorldTransform().GetPositionVector();
-    //spaceship->SetTransform();
-    camera->SetPosition(spaceship->GetTransform().GetPositionVector());
-    camera->SetYaw(-90.0f);
+    if (playTime) {}
 }
 
 void URenderer::UpdateScene(float dt) {
     camera->UpdateCamera(10 * dt);
-    //cout << camera->GetPosition();
+    cout << camera->GetPosition();
     Vector3 camPos = camera->GetPosition();
     Vector3 shipPos = spaceship->GetTransform().GetPositionVector();
+
     if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_V)) {
         switch (viewFlag)
         {
@@ -100,12 +100,24 @@ void URenderer::UpdateScene(float dt) {
     }
     frameFrustum.FromMatrix(projMatrix * viewMatrix);
     root->Update(dt);
+
     if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_F)) { splitView = !splitView; }
     if (!splitView) { RenderScene(); }
     else if (splitView) {
         camera1->SetPosition(Vector3(camPos.x + 12.5, camPos.y + 2, camPos.z + 30));
         SplitRenderScene();
     }
+
+    //autoPlay
+    if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_P)) {
+        autoPlay = !autoPlay;
+    }
+    if (autoPlay)
+    {
+        AutoScene();
+        playTime += dt;
+    }
+    else if (!autoPlay) { playTime = 0.0f; }
 
 }
 
@@ -213,7 +225,7 @@ void URenderer::RenderScene() {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glViewport(0, 0, width, height);
     viewMatrix = camera->BuildViewMatrix();
-    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 60.0f);
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
     DrawSkybox();
     DrawMainScene();
     DrawunLight(sun);

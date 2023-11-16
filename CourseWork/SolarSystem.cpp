@@ -63,10 +63,10 @@ SolarSystem::SolarSystem()
     texture = SOIL_load_OGL_texture(TEXTUREDIR"Starfield/3.earth_clouds.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
     earthCloud->SetColour(Vector4(1.0f, 1.0f, 1.0f, 0.5f));
     earthCloud->SetTransform(Matrix4::Translation(Vector3(0.0f, 0.0f, 0.0f)));
-    earthCloud->SetModelScale(Vector3(63.1f, 63.1f, 63.1f));
+    earthCloud->SetModelScale(Vector3(63.5f, 63.5f, 63.5f));
     earthCloud->SetMesh(m);
     earthCloud->SetTexture(texture);
-    earthCloud->SetBoundingRadius(63.1f);
+    earthCloud->SetBoundingRadius(63.5f);
     earth->AddChild(earthCloud);
     //moon
     moon = new SceneNode();
@@ -178,7 +178,7 @@ void SolarSystem::Update(float dt)
     sun->SetTransform(sun->GetTransform() * Matrix4::Rotation(-2.4f * dt, Vector3(0, 1, 0))); //0
     mercury->SetTransform(mercury->GetTransform() * Matrix4::Rotation(-1.02f * dt, Vector3(0, 1, 0))); //1
     gold->SetTransform(gold->GetTransform() * Matrix4::Rotation(-0.25f * dt, Vector3(0, 1, 0))); //2
-    earth->SetTransform(earth->GetTransform() * Matrix4::Rotation(-120.0f * dt, Vector3(0, 1, 0))); //3
+    earth->SetTransform(earth->GetTransform() * Matrix4::Rotation(-60.0f * dt, Vector3(0, 1, 0))); //3
     moon->SetTransform(moon->GetTransform() * Matrix4::Rotation(-30.0f * dt, Vector3(0, 1, 0))); //3.5
     fire->SetTransform(fire->GetTransform() * Matrix4::Rotation(-60.0f * dt, Vector3(0, 1, 0))); //4
     wood->SetTransform(wood->GetTransform() * Matrix4::Rotation(-144.0f * dt, Vector3(0, 1, 0))); //5

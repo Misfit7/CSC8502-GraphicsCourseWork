@@ -4,7 +4,6 @@
 struct Particle {
     Vector3 speed;
     Vector3 position;
-    bool isAlive;
 };
 
 class Rain : public SceneNode {
@@ -13,7 +12,10 @@ public:
     void Update(float dt) override;
     void SetPos(Vector3 p) { pos = p; };
 protected:
-    float numParticles = 1;
+    float numParticles = 150;
     vector<Particle> particle_list;
     Vector3 pos;
+
+    Mesh* Rmesh;
+    GLuint Rtexture;
 };

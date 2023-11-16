@@ -16,10 +16,15 @@ protected:
     void DrawWater();
     void DrawSkybox();
 
+    void DrawPostProcess();
+    void PresentScene();
+
     Shader* lightShader;
     Shader* reflectShader;
     Shader* skyboxShader;
     Shader* FlowWaterShader;
+    Shader* sceneShader;
+    Shader* processShader;
 
     HeightMap* heightMap;
     Mesh* quad;
@@ -36,5 +41,10 @@ protected:
     float waterCycle;
 
     float sceneTime = 0.0f;
+
+    GLuint bufferFBO;
+    GLuint processFBO;
+    GLuint bufferColourTex[2];
+    GLuint bufferDepthTex;
 
 };
