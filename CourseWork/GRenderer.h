@@ -18,7 +18,7 @@ public:
     void RenderScene() override;
     void UpdateScene(float dt) override;
 
-    void AutoScene();
+    void AutoScene(float dt);
 
 protected:
     void DrawHeightmap();
@@ -40,6 +40,9 @@ protected:
     Shader* shadowShader;
     Shader* skinShader;
     Shader* processShader;
+    Shader* deferredsceneShader;
+    Shader* pointlightShader;
+    Shader* combineShader;
 
     //map
     HeightMap* heightMap;
@@ -84,6 +87,7 @@ protected:
     //camera
     Light* light;
     Camera* camera;
+    bool camfree = true;
 
     //material
     GLuint texture;
@@ -120,4 +124,30 @@ protected:
     void DrawPProcess();
     void PresentScene();
 
+    //deferred shading
+    bool bPointLightScene = false;
+    void DrawPointLightScene();
+    void FillBuffers();
+    void DrawPointLights();
+    void CombineBuffers();
+    void GenerateScreenTexture(GLuint& into, bool depth = false);
+    GLuint bufferFBO2; // FBO for our G - Buffer pass
+    GLuint bufferColourTex2; // Albedo goes here
+    GLuint bufferNormalTex2; // Normals go here
+    GLuint bufferDepthTex2; // Depth goes here
+
+    GLuint pointLightFBO; // FBO for our lighting pass
+    GLuint lightDiffuseTex; // Store diffuse lighting
+    GLuint lightSpecularTex; // Store specular lighting
+
+    Light* pointLights; // Array of lighting data
+    Mesh* sphere; // Light volume
+
+    //autoplay
+    float playTime = 0.0f;
+    bool autoPlay = false;
+    bool scene1 = false;
+    bool scene2 = false;
+    bool scene3 = false;
+    bool scene4 = false;
 };

@@ -15,7 +15,7 @@ public:
     void RenderScene() override;
     void UpdateScene(float dt) override;
 
-    void AutoScene();
+    void AutoScene(float dt);
 
 protected:
     //draw

@@ -23,13 +23,9 @@ public:
     float GetPitch() const { return pitch; }
     void SetPitch(float p) { pitch = p; }
 
-    void SetMove(bool n) { move = n; }
-
 protected:
     float yaw;
     float pitch;
     Vector3 position; // Set to 0 ,0 ,0 by Vector3 constructor ;)
-
-    bool move = 1;
 
 };

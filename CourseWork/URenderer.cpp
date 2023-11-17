@@ -58,10 +58,10 @@ URenderer ::~URenderer(void) {
     glDeleteTextures(1, &texture);
 }
 
-void URenderer::AutoScene() {
-    Vector3 firePosition = solar->fire->GetWorldTransform().GetPositionVector();
-    firePosition.y += 100;
-    camera->SetPosition(firePosition);
+void URenderer::AutoScene(float dt) {
+    Vector3 tianPosition = solar->tianwang->GetWorldTransform().GetPositionVector();
+    tianPosition.y += 100;
+    camera->SetPosition(tianPosition);
     Vector3 shipPosition = spaceship->GetWorldTransform().GetPositionVector();
     if (playTime) {}
 }
@@ -114,7 +114,7 @@ void URenderer::UpdateScene(float dt) {
     }
     if (autoPlay)
     {
-        AutoScene();
+        AutoScene(dt);
         playTime += dt;
     }
     else if (!autoPlay) { playTime = 0.0f; }

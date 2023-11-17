@@ -70,16 +70,15 @@ void Renderer::UpdateScene(float dt) {
 }
 
 void Renderer::RenderScene() {
-    glBindFramebuffer(GL_FRAMEBUFFER, bufferFBO);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     DrawScene();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     DrawPostProcess();
     PresentScene();
 }
 
 void Renderer::DrawScene() {
+    glBindFramebuffer(GL_FRAMEBUFFER, bufferFBO);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
     BindShader(sceneShader);
     projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
     UpdateShaderMatrices();
@@ -87,6 +86,7 @@ void Renderer::DrawScene() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, heightTexture);
     heightMap->Draw();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::DrawPostProcess() {
@@ -110,8 +110,8 @@ void Renderer::DrawPostProcess() {
         glBindTexture(GL_TEXTURE_2D, bufferColourTex[0]);
         quad->Draw();
         // Now to swap the colour buffers , and do the second blur pass
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[0], 0);
         glUniform1i(glGetUniformLocation(processShader->GetProgram(), "isVertical"), 1);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[0], 0);
         glBindTexture(GL_TEXTURE_2D, bufferColourTex[1]);
         quad->Draw();
     }

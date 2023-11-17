@@ -33,11 +33,12 @@ public:
     void SetCameraDistance(float f) { distanceFromCamera = f; }
     void SetTexture(GLuint tex) { texture = tex; }
     GLuint GetTexture() const { return texture; }
-    void SetBump(GLuint bmp) { bump = bmp; }
-    GLuint GetBump() const { return bump; }
+    static bool CompareByCameraDistance(SceneNode* a, SceneNode* b) { return (a->distanceFromCamera < b->distanceFromCamera) ? true : false; }
+
     void SetTextures(GLuint tex) { matTextures.emplace_back(tex); }
     vector<GLuint>& GetTextures() { return matTextures; }
-    static bool CompareByCameraDistance(SceneNode* a, SceneNode* b) { return (a->distanceFromCamera < b->distanceFromCamera) ? true : false; }
+    void SetBump(GLuint bmp) { bump = bmp; }
+    GLuint GetBump() const { return bump; }
     void SetSubMesh(bool sb) { bsubMesh = sb; };
     bool GetSubMesh() { return bsubMesh; };
 
@@ -53,8 +54,8 @@ protected:
     float distanceFromCamera = 0.0f;
     float boundingRadius = 1.0f;
     GLuint texture = 0;
+
     GLuint bump = 0;
     vector <GLuint> matTextures;
-
     bool bsubMesh = 0;
 };

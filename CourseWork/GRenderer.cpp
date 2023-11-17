@@ -7,9 +7,11 @@ using namespace std;
 
 #define SHADOWSIZE 2048
 const int POST_PASSES = 10;
+const int LIGHT_NUM = 32;
 
 GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
     quad = Mesh::GenerateQuad();
+    sphere = Mesh::LoadFromMeshFile("Sphere.msh");
     heightMap = new HeightMap(TEXTUREDIR"Starfield/noise.png");
 
     waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
@@ -29,21 +31,26 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
 
     reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
     skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
-    //lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
     lightShader = new Shader("shadowscenevert.glsl", "shadowscenefrag.glsl");
     textureShader = new Shader("TexturedVertex.glsl", "TexturedFragment.glsl");
     shadowShader = new Shader("shadowVert.glsl", "shadowFrag.glsl");
     skinShader = new Shader("SkinningVertex.glsl", "PerPixelFragment.glsl");
     sceneShader = new Shader("TexturedVertex.glsl", "TexturedFragment.glsl");
     processShader = new Shader("TexturedVertex.glsl", "processfrag.glsl");
+    deferredsceneShader = new Shader("BumpVertex.glsl", "bufferFragment.glsl");
+    pointlightShader = new Shader("pointlightvert.glsl", "pointlightfrag.glsl");
+    combineShader = new Shader("combinevert.glsl", "combinefrag.glsl");
 
-    if (!reflectShader->LoadSuccess() || !skyboxShader->LoadSuccess() || !lightShader->LoadSuccess()) {
+    if (!reflectShader->LoadSuccess() || !skyboxShader->LoadSuccess() || !lightShader->LoadSuccess()
+        || !textureShader->LoadSuccess() || !shadowShader->LoadSuccess() || !skinShader->LoadSuccess()
+        || !sceneShader->LoadSuccess() || !processShader->LoadSuccess() || !deferredsceneShader->LoadSuccess()
+        || !pointlightShader->LoadSuccess() || !combineShader->LoadSuccess()) {
         return;
     }
 
     Vector3 heightmapSize = heightMap->GetHeightmapSize();
 
-    camera = new Camera(-45.0f, 0.0f, heightmapSize * Vector3(0.5f, 2.5f, 0.5f));
+    camera = new Camera(0.0f, 0.0f, heightmapSize * Vector3(0.5f, 2.5f, 0.5f));
     //change light position in UpdateScene();
     light = new Light(Vector3(heightmapSize.x,
         heightmapSize.y, 0), Vector4(1, 1, 1, 1), heightmapSize.z * 10);
@@ -195,6 +202,45 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    //deferred shading
+    pointLights = new Light[LIGHT_NUM];
+    for (int i = 0; i < LIGHT_NUM; ++i) {
+        Light& l = pointLights[i];
+        l.SetColour(Vector4(0.5f + (float)(rand() / (float)RAND_MAX),
+            0.5f + (float)(rand() / (float)RAND_MAX),
+            0.5f + (float)(rand() / (float)RAND_MAX), 1));
+        l.SetRadius(150.0f + (rand() % 150));
+    }
+
+    glGenFramebuffers(1, &bufferFBO2);
+    glGenFramebuffers(1, &pointLightFBO);
+    GLenum buffers[2] = { GL_COLOR_ATTACHMENT0 , GL_COLOR_ATTACHMENT1 };
+
+    GenerateScreenTexture(bufferDepthTex2, true);
+    GenerateScreenTexture(bufferColourTex2);
+    GenerateScreenTexture(bufferNormalTex2);
+    GenerateScreenTexture(lightDiffuseTex);
+    GenerateScreenTexture(lightSpecularTex);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, bufferFBO2);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, bufferDepthTex2, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex2, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, bufferNormalTex2, 0);
+    glDrawBuffers(2, buffers);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        return;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, pointLightFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightDiffuseTex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, lightSpecularTex, 0);
+    glDrawBuffers(2, buffers);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        return;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     waterRotate = 0.0f;
@@ -205,17 +251,82 @@ GRenderer::GRenderer(Window& parent) : OGLRenderer(parent) {
 }
 
 GRenderer ::~GRenderer(void) {
+    delete lightShader;
+    delete reflectShader;
+    delete skyboxShader;
+    delete sceneShader;
+    delete textureShader;
+    delete shadowShader;
+    delete skinShader;
+    delete processShader;
+    delete deferredsceneShader;
+    delete pointlightShader;
+    delete combineShader;
+
+    delete anim;
+    delete material;
+
     delete camera;
     delete heightMap;
     delete quad;
-    delete reflectShader;
-    delete skyboxShader;
-    delete lightShader;
     delete light;
+
+    delete mesh;
+    delete tree;
+
+    delete boss;
+    delete bossmesh;
+    delete bossanim;
+    delete bossmaterial;
+
+    delete root;
+    delete root1;
+    delete root2;
+    delete spaceship;
+
+    delete plane;
+    delete planemesh;
+    delete buildings;
+    delete building;
+
+    delete pointLights;
+    delete sphere;
 
     glDeleteTextures(1, &shadowTex);
     glDeleteFramebuffers(1, &shadowFBO);
+
+    delete[] pointLights;
+    glDeleteTextures(1, &bufferColourTex2);
+    glDeleteTextures(1, &bufferNormalTex2);
+    glDeleteTextures(1, &bufferDepthTex2);
+    glDeleteTextures(1, &lightDiffuseTex);
+    glDeleteTextures(1, &lightSpecularTex);
+    glDeleteFramebuffers(1, &bufferFBO2);
+    glDeleteFramebuffers(1, &pointLightFBO);
+
+    glDeleteTextures(2, bufferColourTex);
+    glDeleteTextures(1, &bufferDepthTex);
+    glDeleteFramebuffers(1, &bufferFBO);
+    glDeleteFramebuffers(1, &processFBO);
 }
+
+void GRenderer::GenerateScreenTexture(GLuint& into, bool depth) {
+    glGenTextures(1, &into);
+    glBindTexture(GL_TEXTURE_2D, into);
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    GLuint format = depth ? GL_DEPTH_COMPONENT24 : GL_RGBA8;
+    GLuint type = depth ? GL_DEPTH_COMPONENT : GL_RGBA;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, type, GL_UNSIGNED_BYTE, NULL);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 
 void GRenderer::BuildNodeLists(SceneNode* from) {
     if (1) {
@@ -280,24 +391,53 @@ void GRenderer::ClearNodeLists() {
     nodeList.clear();
 }
 
-void GRenderer::AutoScene() {
+void GRenderer::AutoScene(float dt) {
+    Matrix4 ssT = spaceship->GetTransform();
+    Vector3 camPos = camera->GetPosition();
+    if (!scene1)
+    {
+        if (camPos.x >= 5430)
+            camPos.x -= 3;
+        if (camPos.z >= 4650)
+            camPos.z -= 3;
+        camera->SetPosition(camPos);
+        if (camera->GetPitch() >= -12.6)
+            camera->SetPitch(camera->GetPitch() - 0.25);
+        if (camera->GetYaw() <= 52)
+            camera->SetYaw(camera->GetYaw() + 0.25);
+        if (camPos.x <= 5430 && camPos.z <= 4650 && camera->GetPitch() <= -12.6 && camera->GetYaw() >= 52) scene1 = true;
+    }
+
+    if (scene1 && !scene2)
+    {
+        /*if (camPos.x >= 5430)
+            camPos.x -= 3;
+        if (camPos.z >= 4650)
+            camPos.z -= 3;
+        camera->SetPosition(camPos);
+        if (camera->GetPitch() >= -12.6)
+            camera->SetPitch(camera->GetPitch() - 0.25);
+        if (camera->GetYaw() <= 52)
+            camera->SetYaw(camera->GetYaw() + 0.25);
+        if (camPos.x <= 5430 && camPos.z <= 4650 && camera->GetPitch() <= -12.6 && camera->GetYaw() >= 52) scene1 = true;*/
+    }
 
 }
 
 void GRenderer::AutoSun() {
     Vector3 heightmapSize = heightMap->GetHeightmapSize();
     light->SetPosition(Vector3(heightmapSize.x * 0.5 + cos(sceneTime) * (heightmapSize.x * 0.5),
-        2000 + sin(sceneTime) * 1000, 5600));
+        sin(sceneTime) * 1000, 5600));
 }
 
 void GRenderer::UpdateScene(float dt) {
-    camera->UpdateCamera(10 * dt);
+    if (camfree) camera->UpdateCamera(10 * dt);
     Vector3 camPos = camera->GetPosition();
-    if (camPos.y <= 15) { camera->SetPosition(Vector3(camPos.x, 10, camPos.z)); };
-    //cout << camPos;
+    if (camPos.y <= 15) { camera->SetPosition(Vector3(camPos.x, 15, camPos.z)); };
+    cout << camPos << " " << camera->GetPitch() << " " << camera->GetYaw() << endl;
     //cout << light->GetPosition();
-    waterRotate += dt * 0.25f; // 2 degrees a second
-    waterCycle += dt * 0.25f; // 10 units a second
+    waterRotate += dt * 0.25f;
+    waterCycle += dt * 0.25f;
 
     sceneTime += dt;
     frameTime -= dt;
@@ -315,15 +455,44 @@ void GRenderer::UpdateScene(float dt) {
     root2->Update(dt);
     root2->SetTransform(Matrix4::Translation(Vector3(camPos.x + 10, camPos.y + 10, camPos.z - 10)));
 
-    if (camPos.y <= 60) {
-        DrawPostProcessScene();
-        //RenderScene();
-    }
-    else {
-        RenderScene();
-        //DrawPostProcessScene();
+    Vector3 heightmapSize = heightMap->GetHeightmapSize();
+    if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_O))
+    {
+        bPointLightScene = !bPointLightScene;
+        for (int i = 0; i < LIGHT_NUM; ++i)
+            pointLights[i].SetPosition(Vector3(rand() % (int)heightmapSize.x * 0.25 + (int)heightmapSize.x * 0.25, 200.0f, rand() % (int)heightmapSize.z * 0.25 + (int)heightmapSize.z * 0.25));
     }
 
+    if (camPos.y <= 60) { DrawPostProcessScene(); }
+    else if (bPointLightScene) {
+        DrawPointLightScene();
+    }
+    else { RenderScene(); }
+
+    if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_P)) {
+        autoPlay = !autoPlay;
+        camfree = !camfree;
+        if (autoPlay) {
+            delete camera;
+            camera = new Camera(0.0f, 0.0f, heightmapSize * Vector3(0.5f, 2.5f, 0.5f));
+            scene1 = false;
+            scene2 = false;
+            scene3 = false;
+            scene4 = false;
+        }
+    }
+    if (autoPlay)
+    {
+        AutoScene(dt);
+        playTime += dt;
+    }
+    else if (!autoPlay) { playTime = 0.0f; }
+
+    /*for (int i = 0; i < 1; i++)
+    {
+        Vector3 t = Vector3(7216.0f + i * 700, 750.0f, 6500 + i * 700);
+        sceneTransforms[i] = Matrix4::Translation(t);
+    }*/
 }
 
 void GRenderer::RenderScene() {
@@ -335,12 +504,99 @@ void GRenderer::RenderScene() {
     DrawSkybox();
     DrawHeightmap();
     DrawMainScene();
+    DrawShadowScene();
     DrawBuilding();
-    //DrawShadowScene();
     DrawActor();
     DrawRain();
     DrawWater();
 
+}
+
+void GRenderer::DrawPointLightScene() {
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+    viewMatrix = camera->BuildViewMatrix();
+    glBindFramebuffer(GL_FRAMEBUFFER, bufferFBO2);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    DrawSkybox();
+    DrawHeightmap();
+    DrawMainScene();
+    DrawBuilding();
+    DrawActor();
+    DrawRain();
+    DrawWater();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+    viewMatrix = camera->BuildViewMatrix();
+    DrawPointLights();
+    CombineBuffers();
+}
+
+void GRenderer::DrawPointLights() {
+    glBindFramebuffer(GL_FRAMEBUFFER, pointLightFBO);
+    BindShader(pointlightShader);
+
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glCullFace(GL_FRONT);
+    glDepthFunc(GL_ALWAYS);
+    glDepthMask(GL_FALSE);
+
+    glUniform1i(glGetUniformLocation(pointlightShader->GetProgram(), "depthTex"), 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, bufferDepthTex2);
+
+    glUniform1i(glGetUniformLocation(pointlightShader->GetProgram(), "normTex"), 1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, bufferNormalTex2);
+
+    glUniform3fv(glGetUniformLocation(pointlightShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
+
+    glUniform2f(glGetUniformLocation(pointlightShader->GetProgram(), "pixelSize"), 1.0f / width, 1.0f / height);
+
+    Matrix4 invViewProj = (projMatrix * viewMatrix).Inverse();
+    glUniformMatrix4fv(glGetUniformLocation(pointlightShader->GetProgram(), "inverseProjView"), 1, false, invViewProj.values);
+
+    UpdateShaderMatrices();
+    for (int i = 0; i < LIGHT_NUM; ++i) {
+        Light& l = pointLights[i];
+        SetShaderLight(l);
+        sphere->Draw();
+    }
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glCullFace(GL_BACK);
+    glDepthFunc(GL_LEQUAL);
+
+    glDepthMask(GL_TRUE);
+
+    glClearColor(0.2f, 0.2f, 0.2f, 1);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GRenderer::CombineBuffers() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    BindShader(combineShader);
+    modelMatrix.ToIdentity();
+    viewMatrix.ToIdentity();
+    projMatrix.ToIdentity();
+    UpdateShaderMatrices();
+
+    glUniform1i(glGetUniformLocation(combineShader->GetProgram(), "diffuseTex"), 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, bufferColourTex2);
+
+    glUniform1i(glGetUniformLocation(combineShader->GetProgram(), "diffuseLight"), 1);
+    glActiveTexture(GL_TEXTURE1);
+
+    glBindTexture(GL_TEXTURE_2D, lightDiffuseTex);
+
+    glUniform1i(glGetUniformLocation(combineShader->GetProgram(), "specularLight"), 2);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, lightSpecularTex);
+
+    quad->Draw();
 }
 
 void GRenderer::DrawPostProcessScene() {
@@ -495,25 +751,22 @@ void GRenderer::DrawShadowScene() {
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
     BindShader(shadowShader);
-    Vector3 hmapsize = heightMap->GetHeightmapSize();
     Vector3 ltPos = light->GetPosition();
-
-    viewMatrix = Matrix4::BuildViewMatrix(Vector3(ltPos), Vector3(5700, 125, 8000));
+    viewMatrix = Matrix4::BuildViewMatrix(Vector3(ltPos), Vector3(6800, 125, 16000));
     projMatrix = Matrix4::Perspective(1, 10000, 1, 45);
     shadowMatrix = projMatrix * viewMatrix; // used later
 
     for (int i = 0; i < 1; ++i) {
-        modelMatrix = sceneTransforms[i] * Matrix4::Scale(Vector3(1, 1, 1));
+        modelMatrix = sceneTransforms[i];
         UpdateShaderMatrices();
         Vbuilding[i]->GetMesh()->Draw();
     }
 
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glViewport(0, 0, width, height);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
     viewMatrix = camera->BuildViewMatrix();
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glViewport(0, 0, width, height);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void GRenderer::DrawBuilding() {

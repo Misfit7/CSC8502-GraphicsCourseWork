@@ -32,7 +32,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
 
     sceneTransforms.resize(4);
@@ -58,10 +58,10 @@ void Renderer::UpdateScene(float dt) {
     camera->UpdateCamera(dt);
     cout << camera->GetPosition();
     sceneTime += dt;
-    light->SetPosition(Vector3(-20 + cos(sceneTime) * 2,
+    light->SetPosition(Vector3(-20 + cos(sceneTime) * 10,
         10 + sin(sceneTime) * 2, -20));
     for (int i = 1; i < 3; ++i) { // skip the floor !
-        Vector3 t = Vector3(-10 + (5 * i), 2.0f + 0, 0);
+        Vector3 t = Vector3(-10 + (5 * i), 0, 0);
         sceneTransforms[i] = Matrix4::Translation(t);
     }
 }
@@ -93,7 +93,6 @@ void Renderer::DrawShadowScene() {
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glViewport(0, 0, width, height);
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
