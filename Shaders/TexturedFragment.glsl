@@ -2,7 +2,7 @@
 
 uniform sampler2D diffuseTex;
 
-out vec4 fragColour ;
+out vec4 fragColour;
 
 in Vertex{
     vec2 texCoord;

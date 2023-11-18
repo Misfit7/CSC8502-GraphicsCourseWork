@@ -10,6 +10,7 @@
 #include "../nclgl/MeshAnimation.h"
 
 #include "Rain.h"
+#include "Tree.h"
 
 class GRenderer : public OGLRenderer {
 public:
@@ -43,6 +44,7 @@ protected:
     Shader* deferredsceneShader;
     Shader* pointlightShader;
     Shader* combineShader;
+    Shader* PerPixelShader;
 
     //map
     HeightMap* heightMap;
@@ -55,7 +57,7 @@ protected:
     float frameTime;
     //tree
     Mesh* mesh;
-    SceneNode* tree;
+    Tree* trees;
     //Boss
     SceneNode* boss;
     Mesh* bossmesh;
@@ -150,4 +152,6 @@ protected:
     bool scene2 = false;
     bool scene3 = false;
     bool scene4 = false;
+    float ssAng = 0.0f;
+
 };

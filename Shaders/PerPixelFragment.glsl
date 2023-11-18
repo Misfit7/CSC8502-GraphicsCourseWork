@@ -21,7 +21,7 @@ void main(void) {
     vec3 halfDir = normalize(incident + viewDir);
 
     vec4 diffuse = texture (diffuseTex, IN.texCoord);
-    if (diffuse.a < 0.05f)
+    if (diffuse.a < 0.1f)
     {
         discard;
     }

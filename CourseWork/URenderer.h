@@ -69,5 +69,11 @@ protected:
     //autoplay
     float playTime = 0.0f;
     bool autoPlay = false;
+    bool scene1 = false;
+    bool scene2 = false;
+    bool scene3 = false;
+    bool scene4 = false;
+    float ssAng = 0.0f;
+    bool camfree = true;
 
 };

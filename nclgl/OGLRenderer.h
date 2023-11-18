@@ -60,7 +60,7 @@ public:
     bool			HasInitialised() const;
 
     virtual void AutoScene(float dt) {};
-
+    Shader* currentShader;
 protected:
     void SetShaderLight(const Light& l);
 
@@ -87,7 +87,7 @@ protected:
     int		height;			//Render area height (not quite the same as window height)
     bool	init;			//Did the renderer initialise properly?
 
-    Shader* currentShader;
+
 
 private:
     HDC		deviceContext;	//...Device context?
