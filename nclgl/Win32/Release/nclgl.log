@@ -1,0 +1,42 @@
+﻿  glad.c
+  Camera.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+  ComputeShader.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+  Frustum.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+  GameTimer.cpp
+  GeometryNode.cpp
+  HeightMap.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\HeightMap.cpp(21,57): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\HeightMap.cpp(21,40): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\HeightMap.cpp(22,48): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\HeightMap.cpp(22,45): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+  Keyboard.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+  Light.cpp
+  Matrix2.cpp
+  Matrix3.cpp
+  Matrix4.cpp
+  Mesh.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+  MeshAnimation.cpp
+  MeshMaterial.cpp
+  Mouse.cpp
+  OGLRenderer.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\OGLRenderer.cpp(136,45): error C2039: 'DebugCallback': is not a member of 'OGLRenderer'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\OGLRenderer.h(50): message : see declaration of 'OGLRenderer'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\OGLRenderer.cpp(136,58): error C2065: 'DebugCallback': undeclared identifier
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\OGLRenderer.cpp(235,19): error C2039: 'DebugCallback': is not a member of 'OGLRenderer'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\OGLRenderer.h(50): message : see declaration of 'OGLRenderer'
+  Plane.cpp
+  Quaternion.cpp
+  SceneNode.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+  Shader.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+  Compiling...
+  Window.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss

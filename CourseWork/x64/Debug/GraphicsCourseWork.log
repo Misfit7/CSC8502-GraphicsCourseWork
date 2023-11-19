@@ -1,0 +1,14 @@
+﻿  GRenderer.cpp
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\nclgl\Keyboard.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\Tree.h(22,13): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(59,25): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(109,74): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(437,41): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(483,41): warning C4305: '-=': truncation from 'double' to 'float'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(502,54): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(537,161): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(537,85): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(792,81): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(793,81): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\Users\84251\Desktop\C++\GraphicsCourseWork\CourseWork\GRenderer.cpp(895,37): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  GraphicsCourseWork.vcxproj -> C:\Users\84251\Desktop\C++\GraphicsCourseWork\x64\Debug\GraphicsCourseWork.exe

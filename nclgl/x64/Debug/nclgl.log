@@ -1,0 +1,36 @@
+﻿  glad.c
+  Camera.cpp
+  ComputeShader.cpp
+  Frustum.cpp
+  GameTimer.cpp
+  GeometryNode.cpp
+  HeightMap.cpp
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\HeightMap.cpp(21,57): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\HeightMap.cpp(21,40): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\HeightMap.cpp(22,48): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\HeightMap.cpp(22,45): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+  Keyboard.cpp
+  Light.cpp
+  Matrix2.cpp
+  Matrix3.cpp
+  Matrix4.cpp
+  Mesh.cpp
+  MeshAnimation.cpp
+  MeshMaterial.cpp
+  Mouse.cpp
+  OBJMesh.cpp
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\OBJMesh.cpp(206,52): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\OBJMesh.cpp(312,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\OBJMesh.cpp(316,63): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\OBJMesh.cpp(328,59): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\nclgl\OBJMesh.cpp(332,60): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  OGLRenderer.cpp
+  Plane.cpp
+  Quaternion.cpp
+  SceneNode.cpp
+  Generating Code...
+  Compiling...
+  Shader.cpp
+  Window.cpp
+  Generating Code...
+  nclgl.vcxproj -> H:\Desktop\GraphicsCourseWork\GraphicsCourseWork\x64\Debug\nclgl.lib
