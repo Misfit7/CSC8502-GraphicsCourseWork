@@ -9,9 +9,9 @@ int main() {
 	}
 
 	OGLRenderer* renderer = nullptr;
-	URenderer* Urenderer = new URenderer(w);
-	GRenderer* Grenderer = nullptr;
-	renderer = Urenderer;
+	GRenderer* Grenderer = new GRenderer(w);
+	URenderer* Urenderer = nullptr;
+	renderer = Grenderer;
 	if (!renderer->HasInitialised()) {
 		return -1;
 	}
