@@ -35,23 +35,23 @@ Most of the functionality is demonstrated in the following demo [video](https://
 
 ## General:
 
-"F1" - Switch to ground scene.
-"F2" - Switch to surface scene.
-"WASD" - Move camera.
-"SHIFT" - Camera up.
-"SPACE" - Camera down.
+"F1" - Switch to ground scene.  
+"F2" - Switch to surface scene.  
+"WASD" - Move camera.  
+"SHIFT" - Camera up.  
+"SPACE" - Camera down.  
 
 ## Surface Scene:
 
-“T” – Enable day-night cycle.
-“O” – Enable deferred rendering.
-“P” –  Enable and stop autoplay.
+“T” – Enable day-night cycle.  
+“O” – Enable deferred rendering.  
+“P” –  Enable and stop autoplay.  
 
 ## Space Scene:
 
-"V" - Switch to different perspectives.
-“F” – Switches the screen to the split screen implementation.
-“P” –  Enable and stop autoplay.
+"V" - Switch to different perspectives.  
+“F” – Switches the screen to the split screen implementation.  
+“P” –  Enable and stop autoplay.  
 
 # Real-Time Lighting
 
