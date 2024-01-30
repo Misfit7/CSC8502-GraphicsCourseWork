@@ -3,9 +3,9 @@
 
 Using C++ and OpenGL that renders a space scene, that transitions between being on the planet surface, to looking down to the planet from space.
 
-# Youtube Link:
+# Demo Link:
 
-Most of the functionality is demonstrated in the following demo [video](https://youtu.be/MonSYgP1leY)
+Most of the functionality is demonstrated in the following demo Youtube: [video](https://youtu.be/MonSYgP1leY) Bili: [video](https://www.bilibili.com/video/BV1FK4y1r73i/)
 
 # List of Features
 ## Core:
